@@ -1,18 +1,20 @@
 import { el, fromHTML } from "../utils/dom.js";
 import { config } from "../config.js";
-import { t, getLang } from "../utils/store.js";
+import { getLang } from "../utils/store.js";
 import { pendantChainSVG } from "../utils/icons.js";
 
 function splitLetters(text) {
   return [...text].map((ch) =>
-    el("span", { class: "letter" }, ch === " " ? " " : ch)
+    el("span", { class: "letter" }, ch === " " ? " " : ch)
   );
 }
 
-function formatDate(lang) {
-  const date = new Date(config.weddingDate);
-  const formatted = new Intl.DateTimeFormat(lang === "fr" ? "fr-FR" : "en-US", t().hero.dateFormat).format(date);
-  return formatted;
+function dateText(lang) {
+  return config.weddingDateDisplay[lang] || config.weddingDateDisplay.en;
+}
+
+function taglineText(lang) {
+  return config.couple.tagline[lang] || config.couple.tagline.en;
 }
 
 export function createHeroSection() {
@@ -20,7 +22,8 @@ export function createHeroSection() {
   const amp = el("span", { class: "hero-ampersand" }, "&");
   const name2 = el("span", { class: "hero-name-2" }, splitLetters(config.couple.partner2));
 
-  const dateEl = el("p", { class: "hero-date" }, formatDate(getLang()));
+  const taglineEl = el("p", { class: "hero-tagline" }, taglineText(getLang()));
+  const dateEl = el("p", { class: "hero-date" }, dateText(getLang()));
 
   const chainsEl = fromHTML(pendantChainSVG());
   const badge = el("div", { class: "hero-badge" }, [
@@ -31,14 +34,13 @@ export function createHeroSection() {
   const node = el("section", { class: "section hero", id: "hero" }, [
     el("h1", { class: "hero-names sr-only" }, `${config.couple.partner1} & ${config.couple.partner2}`),
     pendant,
+    taglineEl,
     dateEl,
-    el("div", { class: "hero-photo-frame" }, [
-      el("div", { class: "hero-photo-placeholder" }, "Couple photo placeholder — replace in /public/images"),
-    ]),
   ]);
 
   function updateLang() {
-    dateEl.textContent = formatDate(getLang());
+    taglineEl.textContent = taglineText(getLang());
+    dateEl.textContent = dateText(getLang());
   }
 
   return {

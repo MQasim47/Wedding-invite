@@ -7,6 +7,6 @@
   </defs>
   <rect width="1200" height="630" fill="url(#bg)" />
   <rect x="40" y="40" width="1120" height="550" fill="none" stroke="#C9A96E" stroke-width="2" />
-  <text x="600" y="300" font-family="Georgia, serif" font-size="120" fill="#FBF7F2" text-anchor="middle">Alex &amp; Sarah</text>
-  <text x="600" y="370" font-family="Georgia, serif" font-size="32" letter-spacing="6" fill="#C9A96E" text-anchor="middle">12 · DECEMBER · 2026</text>
+  <text x="600" y="300" font-family="Georgia, serif" font-size="120" fill="#FBF7F2" text-anchor="middle">Dalida &amp; Aimé</text>
+  <text x="600" y="370" font-family="Georgia, serif" font-size="30" letter-spacing="3" fill="#C9A96E" text-anchor="middle">DECEMBER 5, 2026 · 5 DÉCEMBRE 2026</text>
 </svg>

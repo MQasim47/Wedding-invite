@@ -3,11 +3,8 @@ import { config } from "../config.js";
 import { getLang } from "../utils/store.js";
 
 function buildLines() {
-  const text = config.welcomeMessage[getLang()] || config.welcomeMessage.en;
-  return text.split(". ").filter(Boolean).map((sentence, i, arr) => {
-    const full = sentence.trim() + (i < arr.length - 1 ? "." : "");
-    return el("span", { class: "line fade-up" }, full);
-  });
+  const paragraphs = config.welcomeMessage[getLang()] || config.welcomeMessage.en;
+  return paragraphs.map((paragraph) => el("span", { class: "line fade-up" }, paragraph));
 }
 
 export function createWelcomeSection() {

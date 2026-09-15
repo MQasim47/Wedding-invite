@@ -8,11 +8,11 @@ export const i18n = {
     envelope: {
       hint: "Tap to open",
     },
-    hero: {
-      dateFormat: { weekday: "long", day: "numeric", month: "long", year: "numeric" },
-    },
     greeting: {
       dear: "Dear",
+    },
+    story: {
+      title: "Our Story",
     },
     calendar: {
       title: "Save the Date",
@@ -41,7 +41,7 @@ export const i18n = {
     },
     rsvp: {
       title: "RSVP",
-      deadlinePrefix: "Kindly respond by",
+      deadlinePrefix: "Kindly confirm your attendance by",
       name: "Full Name",
       namePlaceholder: "Your full name",
       attending: "Will you attend?",
@@ -58,6 +58,8 @@ export const i18n = {
       errorName: "Please enter your name.",
       errorAttending: "Please select an option.",
       demoNotice: "Demo mode — no data was actually sent.",
+      closedTitle: "RSVP Closed",
+      closedMessage: "Thank you for your interest — the RSVP deadline has passed. Please reach out to the couple directly if you'd like to let them know.",
     },
     extras: {
       galleryTitle: "Gallery",
@@ -81,11 +83,11 @@ export const i18n = {
     envelope: {
       hint: "Touchez pour ouvrir",
     },
-    hero: {
-      dateFormat: { weekday: "long", day: "numeric", month: "long", year: "numeric" },
-    },
     greeting: {
       dear: "Cher/Chère",
+    },
+    story: {
+      title: "Notre histoire",
     },
     calendar: {
       title: "Réservez la date",
@@ -114,7 +116,7 @@ export const i18n = {
     },
     rsvp: {
       title: "RSVP",
-      deadlinePrefix: "Merci de répondre avant le",
+      deadlinePrefix: "Merci de confirmer votre présence avant le",
       name: "Nom complet",
       namePlaceholder: "Votre nom complet",
       attending: "Serez-vous présent(e) ?",
@@ -131,6 +133,8 @@ export const i18n = {
       errorName: "Veuillez entrer votre nom.",
       errorAttending: "Veuillez sélectionner une option.",
       demoNotice: "Mode démo — aucune donnée n'a été envoyée.",
+      closedTitle: "RSVP clôturé",
+      closedMessage: "Merci de votre intérêt — la date limite de confirmation est dépassée. N'hésitez pas à contacter directement les mariés.",
     },
     extras: {
       galleryTitle: "Galerie",
@@ -151,8 +155,34 @@ export const i18n = {
   },
 };
 
-// Resolves the active language: "bilingual" starts on "en" but can be toggled.
+const LANG_STORAGE_KEY = "wedding-lang";
+
+// Resolves the starting language. A fixed "en"/"fr" config always wins. For
+// "bilingual", a language the guest previously toggled to (remembered in
+// localStorage) wins; otherwise it's detected from the browser, defaulting
+// to French only when navigator.language starts with "fr".
 export function resolveInitialLanguage(configLanguage) {
-  if (configLanguage === "bilingual") return "en";
-  return configLanguage === "fr" ? "fr" : "en";
+  if (configLanguage !== "bilingual") {
+    return configLanguage === "fr" ? "fr" : "en";
+  }
+
+  try {
+    const stored = localStorage.getItem(LANG_STORAGE_KEY);
+    if (stored === "en" || stored === "fr") return stored;
+  } catch {
+    // localStorage unavailable (private mode, disabled storage, etc.) — fall
+    // through to browser-language detection.
+  }
+
+  const navLang = typeof navigator !== "undefined" ? navigator.language || "" : "";
+  return navLang.toLowerCase().startsWith("fr") ? "fr" : "en";
+}
+
+// Remembers a guest's explicit language choice for their next visit.
+export function persistLanguage(lang) {
+  try {
+    localStorage.setItem(LANG_STORAGE_KEY, lang);
+  } catch {
+    // Ignore — persistence is a nice-to-have, not a requirement.
+  }
 }

@@ -6,16 +6,29 @@ function createGallery() {
   const { gallery } = config.extras;
   if (!gallery.enabled || gallery.images.length === 0) return null;
 
-  const items = gallery.images.map((src, i) =>
-    el("div", { class: "gallery-item" }, [
-      el("img", { src, alt: `Gallery photo ${i + 1}`, loading: "lazy", decoding: "async" }),
-    ])
+  const imgEls = gallery.images.map((photo) =>
+    el("img", {
+      src: photo.src,
+      alt: photo.alt[getLang()] || photo.alt.en,
+      loading: "lazy",
+      decoding: "async",
+      style: photo.position ? `object-position: ${photo.position};` : null,
+    })
   );
+  const items = imgEls.map((img) => el("div", { class: "gallery-item" }, [img]));
 
   const title = el("h2", { class: "section-title-serif" }, t().extras.galleryTitle);
   const node = el("section", { class: "section", id: "gallery" }, [title, el("div", { class: "gallery-scroll" }, items)]);
 
-  return { node, updateLang: () => (title.textContent = t().extras.galleryTitle) };
+  function updateLang() {
+    title.textContent = t().extras.galleryTitle;
+    imgEls.forEach((img, i) => {
+      const photo = gallery.images[i];
+      img.alt = photo.alt[getLang()] || photo.alt.en;
+    });
+  }
+
+  return { node, updateLang };
 }
 
 function createDressCode() {

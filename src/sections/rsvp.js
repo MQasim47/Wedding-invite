@@ -16,8 +16,32 @@ function formatDeadline(lang) {
   }).format(date);
 }
 
+// Guests can still RSVP through the whole calendar day of the deadline.
+function isDeadlinePassed() {
+  return Date.now() > new Date(`${config.rsvp.deadline}T23:59:59`).getTime();
+}
+
 export function createRsvpSection() {
   if (!config.rsvp.enabled) return null;
+
+  const sectionTitle = el("h2", { class: "section-title-serif" }, t().rsvp.title);
+
+  if (isDeadlinePassed()) {
+    const closedTitle = el("p", { class: "rsvp-success-title" }, t().rsvp.closedTitle);
+    const closedMsg = el("p", {}, t().rsvp.closedMessage);
+    const node = el("section", { class: "section", id: "rsvp" }, [
+      sectionTitle,
+      el("div", { class: "rsvp-success" }, [closedTitle, closedMsg]),
+    ]);
+
+    function updateLang() {
+      sectionTitle.textContent = t().rsvp.title;
+      closedTitle.textContent = t().rsvp.closedTitle;
+      closedMsg.textContent = t().rsvp.closedMessage;
+    }
+
+    return { node, updateLang };
+  }
 
   let attending = null; // "yes" | "no"
   let guestCount = 1;
@@ -84,8 +108,6 @@ export function createRsvpSection() {
   const successTitle = el("p", { class: "rsvp-success-title" }, t().rsvp.successTitle);
   const successMsg = el("p", {}, t().rsvp.successMessage);
   const successWrap = el("div", { class: "rsvp-success", hidden: true }, [successCheck, successTitle, successMsg]);
-
-  const sectionTitle = el("h2", { class: "section-title-serif" }, t().rsvp.title);
 
   const node = el("section", { class: "section", id: "rsvp" }, [
     sectionTitle,
@@ -198,7 +220,7 @@ export function createRsvpSection() {
 
   function updateLang() {
     sectionTitle.textContent = t().rsvp.title;
-    deadlineEl.textContent = `${t().rsvp.deadlinePrefix} ${formatDeadline(getLang())}`;
+    deadlineEl.textContent = `${t().rsvp.deadlinePrefix} ${formatDeadline(getLang())}.`;
     nameLabel.textContent = t().rsvp.name;
     nameInput.placeholder = t().rsvp.namePlaceholder;
     attendingLabel.textContent = t().rsvp.attending;
@@ -212,7 +234,7 @@ export function createRsvpSection() {
     successMsg.textContent = t().rsvp.successMessage;
   }
 
-  deadlineEl.textContent = `${t().rsvp.deadlinePrefix} ${formatDeadline(getLang())}`;
+  deadlineEl.textContent = `${t().rsvp.deadlinePrefix} ${formatDeadline(getLang())}.`;
 
   return { node, updateLang };
 }

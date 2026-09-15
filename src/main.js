@@ -19,6 +19,7 @@ import { createCompanionSection } from "./sections/companion.js";
 import { createHeroSection } from "./sections/hero.js";
 import { createGreetingSection } from "./sections/greeting.js";
 import { createWelcomeSection } from "./sections/welcome.js";
+import { createStorySection } from "./sections/story.js";
 import { createCalendarSection } from "./sections/calendar.js";
 import { createScheduleSection } from "./sections/schedule.js";
 import { createVenueSection } from "./sections/venue.js";
@@ -52,6 +53,7 @@ function registerSection(result) {
 const heroSection = registerSection(createHeroSection());
 registerSection(createGreetingSection());
 registerSection(createWelcomeSection());
+registerSection(createStorySection());
 const calendarSection = registerSection(createCalendarSection());
 const scheduleSection = registerSection(createScheduleSection());
 registerSection(createVenueSection());

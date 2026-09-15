@@ -1,9 +1,9 @@
-# Wedding Invitation — Alex & Sarah (placeholder)
+# Wedding Invitation — Dalida & Aimé
 
 A premium, mobile-first animated wedding invitation. Built with Vite + vanilla
-JavaScript, GSAP (ScrollTrigger), and Lenis for smooth scrolling. All content
-is placeholder data — see [Personalizing this site](#personalizing-this-site)
-below for exactly what to change when real details arrive.
+JavaScript, GSAP (ScrollTrigger), and Lenis for smooth scrolling. See
+[Personalizing this site](#personalizing-this-site) below for exactly what to
+change to update content.
 
 ## Run locally
 
@@ -32,21 +32,25 @@ touch component or animation code to update real details.
 
 | Field | What to change |
 |---|---|
-| `language` | `"en"`, `"fr"`, or `"bilingual"` (adds an EN/FR toggle button) |
+| `language` | `"en"`, `"fr"`, or `"bilingual"` (adds an EN/FR toggle button). In `"bilingual"` mode the starting language is whatever the guest last picked (remembered in `localStorage`), else detected from their browser (`navigator.language` starting with `"fr"` → French, otherwise English) |
 | `couple.partner1` / `partner2` / `initials` | Names and the initials shown on the wax seal |
-| `weddingDate` | ISO date **with timezone offset**, e.g. `"2026-12-12T16:00:00+05:00"` — drives the countdown, calendar, and the downloadable `.ics` file |
-| `timezoneLabel` | Just a label shown near the date (e.g. `"PKT"`) |
-| `welcomeMessage` | The English/French welcome paragraph |
-| `schedule` | Array of `{ time, title: { en, fr }, icon }` — `icon` must be one of the keys in `src/utils/icons.js` (`rings`, `glasses`, `dinner`, `heart`) |
-| `venues` | Array of `{ name, address, mapsUrl }` — add a second object for a second venue, it renders automatically |
+| `couple.tagline` | Bilingual `{ en, fr }` line under the names on the Hero (e.g. "are getting married") |
+| `couple.photo` | `{ src, alt: { en, fr }, position }` — the photo shown in the "Our Story" section. `src` must point at an **optimized** file under `public/images/couple/optimized/` (see [Couple photos](#couple-photos)); `position` is a CSS `object-position` value, tune it if the crop cuts off a face |
+| `weddingDate` | ISO date **with timezone offset**, e.g. `"2026-12-05T15:00:00-05:00"` — this is the ceremony start. Drives the countdown and the `.ics` file (both timezone-correct for a guest in any timezone) and the calendar's highlighted day (read directly from this string's own date digits, not the browser's local time, so it can't roll over to the wrong day for a guest on the other side of the world) |
+| `timezoneLabel` | Just a label (e.g. `"EST"`) — currently unused in the UI, kept for reference |
+| `weddingDateDisplay` | Bilingual `{ en, fr }` literal string shown under the names on the Hero, e.g. `"Saturday · December 5, 2026"` / `"Samedi · 5 décembre 2026"` — update this alongside `weddingDate` if the date changes, it is not auto-derived |
+| `welcomeMessage` | `{ en: string[], fr: string[] }` — one array entry per paragraph |
+| `schedule` | Array of `{ time: { en, fr }, title: { en, fr }, icon, venueIndex, dressCode?, note? }`. `icon` must be one of the keys in `src/utils/icons.js` (`rings`, `glasses`, `dinner`, `heart`). `venueIndex` is the index into `venues` below — used to roll dress codes up onto the matching venue card. `time` should already be formatted per-language (12-hour "3:00 PM" for `en`, 24-hour "15h00" for `fr`) since it's shown as-is, not computed |
+| `venues` | Array of `{ heading: { en, fr } \| string, label: { en, fr } \| null, address, mapsUrl }` — add a third object for a third venue, it renders automatically. `label` is an optional small caps kicker above the heading (e.g. "Reception") |
 | `closingMessage` | Final sign-off message |
 | `theme` | Hex colors — the entire site's palette flows from here |
 | `music.enabled` / `music.src` | Toggle background music and its file path (see [Music](#music)) |
 | `rsvp.enabled` | Set `false` to hide the RSVP section entirely |
-| `rsvp.deadline` | `YYYY-MM-DD`, shown above the form |
+| `rsvp.deadline` | `YYYY-MM-DD`, shown above the form. Once the guest's local clock passes 23:59 on this date, the form is replaced by a closed message (both languages) instead of accepting new responses |
 | `rsvp.endpoint` | Your deployed Google Apps Script URL (see [RSVP setup](#rsvp-setup)) — leave empty for demo mode |
 | `rsvp.maxGuests` | Upper bound on the guest-count stepper |
-| `extras.gallery` / `dressCode` / `gifts` | Each has an `enabled` flag — set `true` and fill in the fields to show that section |
+| `extras.gallery` | `{ enabled, images: [{ src, alt: { en, fr }, position }] }` — `src` must point at an optimized file (see [Couple photos](#couple-photos)) |
+| `extras.dressCode` / `extras.gifts` | Each has an `enabled` flag — set `true` and fill in the fields to show that section |
 | `companion` | The floating couple illustration that follows scroll — see [Companion illustration](#companion-illustration) |
 | `meta` | Page `<title>`, description, `ogImage` path, and `siteUrl` — these drive the SEO/Open Graph tags injected into `index.html` at build time |
 
@@ -64,16 +68,12 @@ unless you also update the matching path in `config.js`:
 - `public/images/og-image.jpg` — the link-preview image (WhatsApp, iMessage,
   Twitter/X, etc), 1200×630. Most social platforms don't render SVG for
   `og:image`, so this is a rasterized JPG (`config.meta.ogImage` already
-  points at it). Its source design is `public/images/og-image.svg` — when the
-  real couple names/date replace the placeholders, edit the text in that SVG
-  to match, then re-export it as a 1200×630 JPG (open it in a browser and
-  screenshot the 1200×630 area, or use any SVG-to-JPG tool) overwriting
-  `og-image.jpg`.
+  points at it). Its source design is `public/images/og-image.svg` — if the
+  names/date change, edit the text in that SVG to match, then run
+  `npm run generate:og` to re-rasterize it (uses `sharp`, already a
+  devDependency — no screenshotting needed).
 - `public/favicon.svg` — the browser tab icon.
-- The couple photo on the Hero section is currently a themed gradient
-  placeholder (no file needed) — to add a real photo, add an `<img>` inside
-  `.hero-photo-frame` in `src/sections/hero.js` pointing at a file you add
-  under `public/images/`.
+- Couple photos — see [Couple photos](#couple-photos) below.
 - `public/audio/` — see below.
 
 ### Music
@@ -86,6 +86,38 @@ button doesn't render at all (no broken button, no failed network request,
 no console error) — add the file and restart `npm run dev` (or rebuild) and
 the button appears automatically. Set `config.music.enabled = false` to
 remove the button regardless of whether a file is present.
+
+## Couple photos
+
+Raw JPG/PNG originals live in `assets-source/couple-photos/` — deliberately
+**outside** `public/`, and gitignored (`.gitignore`). Vite copies everything
+under `public/` verbatim into the production build, so raw phone photos
+(which can carry GPS EXIF metadata) must never sit there, even if nothing on
+the page links to them — anyone could still guess/crawl the URL. The site
+only ever references the optimized copies.
+
+To use new or replacement photos:
+
+1. Drop the raw files into `assets-source/couple-photos/` (any filename,
+   `.jpg`/`.jpeg`/`.png`).
+2. Run `npm run optimize:photos`. This uses `sharp` (a devDependency) to
+   write a WebP copy of each one into `public/images/couple/optimized/`
+   (which **is** committed) — resized to a 1200px long edge, quality ~80,
+   and with all metadata (EXIF/GPS/ICC) stripped. Re-run it any time you add
+   or change a photo; it overwrites existing output files by name.
+3. Point `config.couple.photo.src` (the "Our Story" section) and/or entries
+   in `config.extras.gallery.images` at the new file(s) under
+   `public/images/couple/optimized/`.
+4. Write real `alt: { en, fr }` text for each — screen readers and SEO both
+   depend on it.
+5. Check the crop at 390px width. Both the "Our Story" frame and gallery
+   items are `object-fit: cover` at a 4:5 aspect ratio; if a face gets cut
+   off, set that image's `position` field (a CSS `object-position` value,
+   e.g. `"center 15%"` to keep the top of the frame in view) rather than
+   re-cropping the source file.
+
+The gallery (`config.extras.gallery.enabled`) is swipeable (horizontal
+scroll-snap) and every image lazy-loads (`loading="lazy"`).
 
 ## Companion illustration
 
@@ -146,13 +178,21 @@ Things worth manually re-checking after any content change:
 
 - `?guest=Test` shows the personalized greeting.
 - Language switching (`language: "en"`, `"fr"`, and `"bilingual"` with the
-  toggle button) translates every section, including form labels and errors.
+  toggle button) translates every section, including form labels, errors,
+  event times (12h EN / 24h FR), dress codes, and venue cards.
 - RSVP demo mode: submit the form with `rsvp.endpoint` empty and confirm the
   success state and console warning appear.
+- RSVP-after-deadline: temporarily set `rsvp.deadline` to a past date and
+  confirm the form is replaced by the closed message in both languages.
 - Countdown-after-date: temporarily set `weddingDate` to a past date and
   confirm the countdown circles are replaced by the "Just Married" message.
+- Download the `.ics` file (Countdown section) and open it — confirm the
+  event spans ceremony start → 11:59 PM, and both venue addresses appear in
+  the description.
 - `prefers-reduced-motion`: enable it in your OS/browser settings and confirm
   the site is still fully usable with animations minimized.
+- At 390px width, check the "Our Story" photo and every gallery photo for
+  cropped-off faces (see [Couple photos](#couple-photos)).
 
 ## Deploying to Vercel
 
@@ -169,12 +209,15 @@ This is a static Vite build — zero configuration needed.
 ```
 src/
   config.js        # all content — the single source of truth
-  i18n.js           # all UI strings, per language
+  i18n.js           # all UI strings, per language + language detection/persistence
   main.js           # boots the app, assembles sections in order
   sections/         # one module per section — builds DOM only
   animations/       # GSAP timelines + ScrollTrigger, theme + smooth scroll setup
   utils/            # countdown, .ics generator, guest param, sanitize, icons, DOM helpers
   styles/           # theme.css (CSS variables) + main.css
+scripts/
+  optimize-photos.mjs     # public/images/couple/*.{jpg,png} -> couple/optimized/*.webp
+  generate-og-image.mjs   # public/images/og-image.svg -> og-image.jpg
 public/
   images/, audio/   # replace placeholders here
 rsvp-backend/

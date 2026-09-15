@@ -1,4 +1,5 @@
 import { config } from "../config.js";
+import { getLang } from "./store.js";
 
 function toICSDate(date) {
   return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
@@ -8,13 +9,40 @@ function escapeICS(text) {
   return String(text).replace(/([,;])/g, "\\$1").replace(/\n/g, "\\n");
 }
 
-// Builds and downloads a .ics calendar file from config data.
+function resolveText(value, lang) {
+  if (value == null) return "";
+  if (typeof value === "string") return value;
+  return value[lang] || value.en;
+}
+
+// config.weddingDate is the ceremony start. With no explicit end time for
+// the last event (the reception), the event runs through 11:59 PM the same
+// day, in the same timezone offset weddingDate was given in.
+function resolveEndDate(startISO) {
+  const match = startISO.match(/^(\d{4}-\d{2}-\d{2})T.*?(Z|[+-]\d{2}:\d{2})$/);
+  if (match) return new Date(`${match[1]}T23:59:00${match[2]}`);
+  return new Date(new Date(startISO).getTime() + 8 * 60 * 60 * 1000);
+}
+
+// Builds and downloads a .ics calendar file spanning the ceremony start
+// through the end of the reception, with every venue address included in
+// the description. DTSTART/DTEND are emitted in UTC (toICSDate), so the
+// event lands at the correct instant for a guest in any timezone.
 export function downloadICS() {
+  const lang = getLang();
   const start = new Date(config.weddingDate);
-  const end = new Date(start.getTime() + 4 * 60 * 60 * 1000); // 4hr default duration
-  const venue = config.venues[0];
-  const summary = `${config.couple.partner1} & ${config.couple.partner2} — Wedding`;
-  const location = venue ? `${venue.name}, ${venue.address}` : "";
+  const end = resolveEndDate(config.weddingDate);
+
+  const summary = `${config.couple.partner1} & ${config.couple.partner2} — ${resolveText(
+    { en: "Wedding", fr: "Mariage" },
+    lang
+  )}`;
+
+  const addressLines = config.venues.map(
+    (venue) => `${resolveText(venue.heading, lang)}: ${venue.address}`
+  );
+  const location = config.venues.map((venue) => venue.address).join(" / ");
+  const description = [summary, ...addressLines].join("\n");
 
   const lines = [
     "BEGIN:VCALENDAR",
@@ -28,7 +56,7 @@ export function downloadICS() {
     `DTEND:${toICSDate(end)}`,
     `SUMMARY:${escapeICS(summary)}`,
     `LOCATION:${escapeICS(location)}`,
-    `DESCRIPTION:${escapeICS(config.meta.description)}`,
+    `DESCRIPTION:${escapeICS(description)}`,
     "END:VEVENT",
     "END:VCALENDAR",
   ];

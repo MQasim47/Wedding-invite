@@ -16,6 +16,13 @@ dist-ssr
 # part of the deliverable, may be third-party content.
 /reference
 
+# Raw couple photos, pre-optimization. Kept outside public/ deliberately —
+# anything under public/ is copied verbatim into the production build, and
+# these may carry EXIF/GPS metadata from phones. Only the stripped WebP
+# copies in public/images/couple/optimized/ (produced by
+# `npm run optimize:photos`) are committed and used by the site.
+/assets-source/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

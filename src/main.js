@@ -104,10 +104,16 @@ sealBtn.addEventListener(
       lenis?.start();
       controls.show();
 
-      if (heroSection) animateHero(heroSection.node);
-      initScrollReveal(appShell);
-      if (scheduleSection) animateTimeline(scheduleSection.node);
-      if (calendarSection) animateCalendarHeart(calendarSection.node);
+      // Deferred a frame: this batch queries/measures across the whole page
+      // (getTotalLength() on two SVG paths, several ScrollTrigger setups) —
+      // running it in the same tick as the envelope's final paint caused a
+      // measurable jank spike right as the screen was still compositing out.
+      requestAnimationFrame(() => {
+        if (heroSection) animateHero(heroSection.node);
+        initScrollReveal(appShell);
+        if (scheduleSection) animateTimeline(scheduleSection.node);
+        if (calendarSection) animateCalendarHeart(calendarSection.node);
+      });
     });
   },
   { once: true }

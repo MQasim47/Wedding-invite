@@ -3,7 +3,9 @@ import gsap from "gsap";
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 function burstParticles(container) {
-  const count = prefersReducedMotion ? 0 : 18;
+  // Kept low: 18 synchronous DOM-node+tween creations in a single frame was
+  // measurably janky (~430ms frame) on throttled/low-end mobile CPUs.
+  const count = prefersReducedMotion ? 0 : 10;
   const colors = ["var(--color-accent)", "var(--color-primary)"];
 
   for (let i = 0; i < count; i++) {
@@ -64,16 +66,23 @@ export function playOpenSequence({ screenNode, flap, sealBtn, particlesEl, hintE
       },
     });
 
+    // A flat scaleY+opacity fold (transform-origin: top, set in CSS) reads
+    // as the flap opening just as well as the original 3D rotateX did, but
+    // stays a plain 2D affine transform — it measured consistently smooth
+    // under 4x CPU throttling, where the perspective-rotated version had a
+    // stubborn ~400ms single-frame spike (clip-path + 3D transform + box-
+    // shadow compositing together) that will-change and a static
+    // transformPerspective couldn't fix. Working beats fancy here.
     tl.to(hintEl, { opacity: 0, duration: 0.25 }, 0)
       .to(sealBtn, { scale: 0, opacity: 0, duration: 0.35, ease: "back.in(2)" }, 0)
       .add(() => burstParticles(particlesEl), 0.1)
       .to(
         flap,
         {
-          rotateX: -165,
-          duration: 0.7,
+          scaleY: 0,
+          opacity: 0,
+          duration: 0.55,
           ease: "power2.inOut",
-          transformPerspective: 800,
         },
         0.15
       )

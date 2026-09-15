@@ -125,7 +125,6 @@ svg { display: block; }
   align-items: center;
   justify-content: center;
   background: var(--color-envelope);
-  perspective: 1600px;
 }
 
 .envelope-screen[data-open="true"] {
@@ -154,6 +153,7 @@ svg { display: block; }
   top: 0; left: 0; right: 0;
   height: 62%;
   transform-origin: top center;
+  will-change: transform; /* pre-promote to its own layer for the scaleY open animation, combined with clip-path below */
   clip-path: polygon(0 0, 100% 0, 50% 100%);
   background: linear-gradient(160deg, var(--color-envelope), color-mix(in srgb, var(--color-envelope) 70%, black 15%));
   z-index: 3;

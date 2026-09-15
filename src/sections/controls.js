@@ -5,8 +5,10 @@ import { icons } from "../utils/icons.js";
 
 // Floating mute/unmute + language toggle buttons. Hidden until the
 // envelope is opened (main.js flips data-visible once music can play).
-export function createControls() {
-  const musicBtn = config.music.enabled
+// `audioAvailable` is false when music is disabled in config OR the
+// configured audio file doesn't exist on disk — either way, no button.
+export function createControls({ audioAvailable } = {}) {
+  const musicBtn = audioAvailable
     ? el("button", {
         class: "control-btn music-btn",
         type: "button",

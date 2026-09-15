@@ -79,10 +79,12 @@ unless you also update the matching path in `config.js`:
 
 No audio file ships with this project (to avoid any copyright issues). Add a
 licensed/royalty-free track as `public/audio/placeholder.mp3` (or change
-`config.music.src` to match your filename). Until a real file is added, the
-envelope tap will silently fail to start music — the mute/unmute button still
-works correctly once a real file is in place. Set `config.music.enabled =
-false` to remove the button entirely.
+`config.music.src` to match your filename). This is checked on disk at
+dev-server-start/build time: while no file is present, the mute/unmute
+button doesn't render at all (no broken button, no failed network request,
+no console error) — add the file and restart `npm run dev` (or rebuild) and
+the button appears automatically. Set `config.music.enabled = false` to
+remove the button regardless of whether a file is present.
 
 ## RSVP setup
 

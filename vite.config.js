@@ -1,4 +1,6 @@
 import { defineConfig } from "vite";
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
 
 // Injects <meta>/<title> tags from src/config.js into index.html at both
 // dev and build time, so config.js stays the single source of truth even
@@ -21,6 +23,20 @@ function injectMetaFromConfig() {
   };
 }
 
-export default defineConfig({
-  plugins: [injectMetaFromConfig()],
+export default defineConfig(async () => {
+  const { config } = await import("./src/config.js");
+
+  // Checked on disk at build/dev-server-start time (not in the browser) so
+  // the app never issues a request for a missing audio file at runtime —
+  // that request would always show up as a failed-resource console error,
+  // no matter how the rejection is caught in JS.
+  const audioPath = resolve("public", config.music.src.replace(/^\/+/, ""));
+  const audioAvailable = config.music.enabled && existsSync(audioPath);
+
+  return {
+    plugins: [injectMetaFromConfig()],
+    define: {
+      __AUDIO_AVAILABLE__: JSON.stringify(audioAvailable),
+    },
+  };
 });

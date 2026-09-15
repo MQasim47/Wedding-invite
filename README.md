@@ -60,12 +60,14 @@ top-level language key (matching the same shape) to support a third language.
 Replace these placeholder files in `public/` — filenames must stay the same
 unless you also update the matching path in `config.js`:
 
-- `public/images/og-image.svg` — the link-preview image (WhatsApp, iMessage,
-  Twitter/X, etc). **This is an SVG placeholder.** Most social platforms
-  require a raster JPG/PNG for `og:image`, so before launch: open this file
-  in a browser (or any SVG tool), export it as a **1200×630 JPG**, save it as
-  `public/images/og-image.jpg`, and update `config.meta.ogImage` in
-  `config.js` to `"/images/og-image.jpg"`.
+- `public/images/og-image.jpg` — the link-preview image (WhatsApp, iMessage,
+  Twitter/X, etc), 1200×630. Most social platforms don't render SVG for
+  `og:image`, so this is a rasterized JPG (`config.meta.ogImage` already
+  points at it). Its source design is `public/images/og-image.svg` — when the
+  real couple names/date replace the placeholders, edit the text in that SVG
+  to match, then re-export it as a 1200×630 JPG (open it in a browser and
+  screenshot the 1200×630 area, or use any SVG-to-JPG tool) overwriting
+  `og-image.jpg`.
 - `public/favicon.svg` — the browser tab icon.
 - The couple photo on the Hero section is currently a themed gradient
   placeholder (no file needed) — to add a real photo, add an `<img>` inside

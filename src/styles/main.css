@@ -7,6 +7,7 @@
 html, body { margin: 0; padding: 0; }
 body {
   min-height: 100vh;
+  min-height: 100dvh; /* iOS Safari: 100vh is the max (chrome-hidden) height, not the visible one */
   font-family: var(--font-serif);
   color: var(--color-text);
   background: var(--color-background);
@@ -20,6 +21,7 @@ button {
   border: none;
   background: none;
   color: inherit;
+  touch-action: manipulation; /* skip the double-tap-to-zoom delay some in-app browsers (WhatsApp, etc.) apply */
 }
 button:focus-visible,
 a:focus-visible,
@@ -28,7 +30,7 @@ textarea:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
-a { color: inherit; }
+a { color: inherit; touch-action: manipulation; }
 h1, h2, h3, p { margin: 0; }
 svg { display: block; }
 
@@ -37,6 +39,7 @@ svg { display: block; }
 /* ---------------------------------------------------------------------- */
 .page-bg {
   min-height: 100vh;
+  min-height: 100dvh;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -59,6 +62,7 @@ svg { display: block; }
   position: relative;
   overflow-x: hidden;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 @media (min-width: 500px) {

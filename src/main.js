@@ -55,7 +55,12 @@ registerSection(createRsvpSection());
 createExtrasSections().forEach(registerSection);
 registerSection(createClosingSection());
 
-const controls = createControls();
+// __AUDIO_AVAILABLE__ is a build-time constant (see vite.config.js) — true
+// only when config.music.enabled AND the configured file actually exists on
+// disk, so a missing file never triggers a runtime request/console error.
+const audioAvailable = __AUDIO_AVAILABLE__;
+
+const controls = createControls({ audioAvailable });
 if (controls.updateLang) langUpdaters.push(controls.updateLang);
 
 onLangChange(() => {
@@ -64,7 +69,7 @@ onLangChange(() => {
 
 // --- Audio -----------------------------------------------------------
 let audioEl = null;
-if (config.music.enabled) {
+if (audioAvailable) {
   audioEl = el("audio", { src: config.music.src, loop: "true", preload: "none" });
   audioEl.volume = 0.6;
   document.body.appendChild(audioEl);
@@ -88,7 +93,7 @@ const pulseTween = idlePulse(sealBtn);
 sealBtn.addEventListener(
   "click",
   () => {
-    if (config.music.enabled && audioEl) {
+    if (audioEl) {
       audioEl.play().catch(() => {
         console.warn("[audio] Autoplay was blocked; use the mute/unmute button to start music.");
       });

@@ -76,7 +76,7 @@ export const config = {
   meta: {
     title: "Alex & Sarah — Wedding Invitation",
     description: "You're invited to our wedding on 12 December 2026",
-    ogImage: "/images/og-image.svg", // placeholder — export a real 1200x630 JPG before launch, see README
+    ogImage: "/images/og-image.jpg", // 1200x630 — regenerate from og-image.svg if names/date change, see README
     siteUrl: "https://example.vercel.app",
   },
 };

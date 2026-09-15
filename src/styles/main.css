@@ -252,6 +252,88 @@ svg { display: block; }
 .control-btn svg { width: 18px; height: 18px; }
 
 /* ---------------------------------------------------------------------- */
+/* Companion illustration                                                 */
+/* ---------------------------------------------------------------------- */
+.companion {
+  position: fixed;
+  width: 80px;
+  height: 80px;
+  z-index: 45;
+  padding: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+/* config.companion.position — the hide-for-RSVP slide and closing fly-in
+   offsets in animations/companion.js are tuned for the documented
+   bottom-left case; other corners still place correctly but reuse those
+   same offsets. */
+.companion[data-position="bottom-left"] {
+  left: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  transform-origin: bottom left;
+}
+.companion[data-position="bottom-right"] {
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  transform-origin: bottom right;
+}
+.companion[data-position="top-left"] {
+  left: 16px;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  transform-origin: top left;
+}
+.companion[data-position="top-right"] {
+  right: 16px;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  transform-origin: top right;
+}
+
+.companion[data-visible="true"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.companion-inner,
+.companion-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.companion-art svg,
+.companion-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.companion-hearts {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.companion-heart {
+  position: absolute;
+  left: 50%;
+  top: 26%;
+  width: 14px;
+  height: 14px;
+  color: var(--color-accent);
+  transform: translate(-50%, -50%);
+}
+
+.companion-heart svg { width: 100%; height: 100%; }
+
+/* ---------------------------------------------------------------------- */
 /* Hero                                                                    */
 /* ---------------------------------------------------------------------- */
 .hero {

@@ -73,6 +73,18 @@ export const config = {
     gifts: { enabled: false, text: { en: "", fr: "" } },
   },
 
+  // A small floating couple illustration that follows scroll. "svg" (the
+  // default) draws a built-in flat-style bride & groom in the theme
+  // colors — leave `src` empty. Set "image" + `src` for a PNG/WebP, or
+  // "lottie" + `src` for a Lottie JSON/.lottie file (lottie-web is only
+  // ever loaded when type is "lottie"). See README for details.
+  companion: {
+    enabled: true,
+    type: "svg", // "svg" | "lottie" | "image"
+    src: "",
+    position: "bottom-left",
+  },
+
   meta: {
     title: "Alex & Sarah — Wedding Invitation",
     description: "You're invited to our wedding on 12 December 2026",

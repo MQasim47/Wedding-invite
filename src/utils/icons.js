@@ -69,6 +69,39 @@ export function pendantChainSVG() {
   </svg>`;
 }
 
+// Original hand-drawn flat-style couple illustration for the default
+// companion type ("svg") — groom in a suit, bride in a veil and dress,
+// holding hands, with a small heart above. Uses theme colors for the
+// outfits so it always matches the site's palette; skin/hair tones are
+// fixed neutral shades (not themeable, since they aren't part of the
+// site's color system).
+export function companionCoupleSVG() {
+  return `<svg viewBox="0 0 120 120" aria-hidden="true">
+    <ellipse cx="60" cy="112" rx="38" ry="5" fill="rgba(0,0,0,0.08)" />
+
+    <!-- groom -->
+    <path d="M28 108 Q26 66 42 62 Q58 66 56 108 Z" fill="var(--color-primary)" />
+    <path d="M38 66 L42 74 L46 66 L44 62 L40 62 Z" fill="#fdfaf5" />
+    <circle cx="42" cy="76" r="2.6" fill="var(--color-accent)" />
+    <circle cx="42" cy="40" r="13" fill="#eab98a" />
+    <path d="M29 37 Q30 25 42 25 Q54 25 55 37 Q47 30 42 30 Q37 30 29 37 Z" fill="#3a2a20" />
+
+    <!-- bride -->
+    <path d="M60 108 Q56 64 78 60 Q104 64 100 108 Q80 116 60 108 Z" fill="#fdfaf5" />
+    <path d="M69 72 L75 108 M87 72 L81 108" stroke="var(--color-accent)" stroke-width="1" opacity="0.5" />
+    <path d="M78 62 Q71 78 78 108 Q85 78 78 62 Z" fill="var(--color-accent)" opacity="0.18" />
+    <ellipse cx="78" cy="34" rx="18" ry="21" fill="#ffffff" opacity="0.55" />
+    <circle cx="78" cy="42" r="13" fill="#eab98a" />
+    <path d="M65 39 Q66 27 78 27 Q90 27 91 39 Q83 32 78 32 Q73 32 65 39 Z" fill="#5a3a24" />
+
+    <!-- joined hands -->
+    <circle cx="59" cy="82" r="4.5" fill="#eab98a" />
+
+    <!-- heart -->
+    <path d="M59 50c-2.6-3.4-7.6-3.4-9.4-0.4-1.8 2.6 0 5.2 9.4 10.4 9.4-5.2 11.2-7.8 9.4-10.4-1.8-3-6.8-3-9.4 0.4z" fill="var(--color-accent)" />
+  </svg>`;
+}
+
 export function envelopePattern() {
   return `<svg viewBox="0 0 200 133" xmlns="http://www.w3.org/2000/svg">
     <defs>

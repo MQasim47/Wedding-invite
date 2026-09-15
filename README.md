@@ -47,6 +47,7 @@ touch component or animation code to update real details.
 | `rsvp.endpoint` | Your deployed Google Apps Script URL (see [RSVP setup](#rsvp-setup)) — leave empty for demo mode |
 | `rsvp.maxGuests` | Upper bound on the guest-count stepper |
 | `extras.gallery` / `dressCode` / `gifts` | Each has an `enabled` flag — set `true` and fill in the fields to show that section |
+| `companion` | The floating couple illustration that follows scroll — see [Companion illustration](#companion-illustration) |
 | `meta` | Page `<title>`, description, `ogImage` path, and `siteUrl` — these drive the SEO/Open Graph tags injected into `index.html` at build time |
 
 ### `src/i18n.js` — all UI strings
@@ -85,6 +86,37 @@ button doesn't render at all (no broken button, no failed network request,
 no console error) — add the file and restart `npm run dev` (or rebuild) and
 the button appears automatically. Set `config.music.enabled = false` to
 remove the button regardless of whether a file is present.
+
+## Companion illustration
+
+A small couple illustration floats in the corner (`config.companion.position`,
+default `"bottom-left"`), bobs gently, occasionally sends up a few heart
+particles, tucks itself away while the RSVP section is in view so it never
+covers the form or the keyboard, and flies into a larger centered spot
+beside the closing message. Tapping it scrolls smoothly to RSVP.
+
+```js
+companion: {
+  enabled: true,
+  type: "svg",   // "svg" | "lottie" | "image"
+  src: "",       // path to a .json/.lottie or .png/.webp file in public/images/
+  position: "bottom-left",
+},
+```
+
+- **`"svg"`** (default) — the built-in hand-drawn couple illustration
+  (`companionCoupleSVG` in `src/utils/icons.js`), themed from `config.theme`.
+  `src` is ignored for this type.
+- **`"image"`** — set `src` to a PNG/WebP under `public/images/` (e.g.
+  `"/images/couple.webp"`); it's rendered as a plain `<img>`.
+- **`"lottie"`** — set `src` to a `.json`/`.lottie` file under `public/`.
+  `lottie-web`'s light player is only ever imported when `type` is
+  `"lottie"` (a lazy `import()`, code-split by Vite), so it adds zero weight
+  to the bundle for the default `"svg"`/`"image"` types. If the file fails
+  to load, it falls back to the default SVG illustration and logs a console
+  warning.
+
+Set `companion.enabled = false` to remove it entirely.
 
 ## RSVP setup
 

@@ -10,10 +10,12 @@ import { animatePendant, startChainShimmer } from "./animations/pendant.js";
 import { initScrollReveal } from "./animations/scrollReveal.js";
 import { animateTimeline } from "./animations/timeline.js";
 import { animateCalendarHeart } from "./animations/calendarHeart.js";
+import { initCompanionAnimations } from "./animations/companion.js";
 import { el } from "./utils/dom.js";
 
 import { createEnvelopeSection } from "./sections/envelope.js";
 import { createControls } from "./sections/controls.js";
+import { createCompanionSection } from "./sections/companion.js";
 import { createHeroSection } from "./sections/hero.js";
 import { createGreetingSection } from "./sections/greeting.js";
 import { createWelcomeSection } from "./sections/welcome.js";
@@ -26,6 +28,8 @@ import { createExtrasSections } from "./sections/extras.js";
 import { createClosingSection } from "./sections/closing.js";
 
 applyTheme();
+
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const app = document.getElementById("app");
 const lenis = initSmoothScroll();
@@ -63,6 +67,19 @@ const audioAvailable = __AUDIO_AVAILABLE__;
 
 const controls = createControls({ audioAvailable });
 if (controls.updateLang) langUpdaters.push(controls.updateLang);
+
+const companion = createCompanionSection({
+  onTap: () => {
+    const rsvpEl = document.getElementById("rsvp");
+    if (!rsvpEl) return;
+    if (lenis) {
+      lenis.scrollTo(rsvpEl, { duration: 1.2 });
+    } else {
+      rsvpEl.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth" });
+    }
+  },
+});
+if (companion?.updateLang) langUpdaters.push(companion.updateLang);
 
 onLangChange(() => {
   langUpdaters.forEach((fn) => fn());
@@ -104,6 +121,7 @@ sealBtn.addEventListener(
       document.documentElement.style.overflow = "";
       lenis?.start();
       controls.show();
+      companion?.show();
 
       // Deferred a frame: this batch queries/measures across the whole page
       // (getTotalLength() on two SVG paths, several ScrollTrigger setups) —
@@ -118,6 +136,13 @@ sealBtn.addEventListener(
         initScrollReveal(appShell);
         if (scheduleSection) animateTimeline(scheduleSection.node);
         if (calendarSection) animateCalendarHeart(calendarSection.node);
+        if (companion) {
+          initCompanionAnimations({
+            node: companion.node,
+            innerNode: companion.innerNode,
+            heartsEl: companion.heartsEl,
+          });
+        }
       });
     });
   },
@@ -127,3 +152,4 @@ sealBtn.addEventListener(
 app.appendChild(pageBg);
 app.appendChild(envelopeNode);
 app.appendChild(controls.node);
+if (companion) app.appendChild(companion.node);

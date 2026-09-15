@@ -71,6 +71,9 @@ export const i18n = {
       play: "Play music",
       pause: "Pause music",
     },
+    companion: {
+      label: "Scroll to RSVP",
+    },
     langToggle: "FR",
   },
 
@@ -140,6 +143,9 @@ export const i18n = {
     music: {
       play: "Jouer la musique",
       pause: "Mettre en pause",
+    },
+    companion: {
+      label: "Défiler jusqu'au RSVP",
     },
     langToggle: "EN",
   },

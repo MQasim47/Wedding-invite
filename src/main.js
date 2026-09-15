@@ -6,6 +6,7 @@ import { applyTheme } from "./animations/theme.js";
 import { initSmoothScroll } from "./animations/smoothScroll.js";
 import { idlePulse, playOpenSequence } from "./animations/envelope.js";
 import { animateHero } from "./animations/hero.js";
+import { animatePendant, startChainShimmer } from "./animations/pendant.js";
 import { initScrollReveal } from "./animations/scrollReveal.js";
 import { animateTimeline } from "./animations/timeline.js";
 import { animateCalendarHeart } from "./animations/calendarHeart.js";
@@ -109,7 +110,11 @@ sealBtn.addEventListener(
       // running it in the same tick as the envelope's final paint caused a
       // measurable jank spike right as the screen was still compositing out.
       requestAnimationFrame(() => {
-        if (heroSection) animateHero(heroSection.node);
+        if (heroSection) {
+          animateHero(heroSection.node);
+          animatePendant(heroSection.pendantNode);
+          startChainShimmer(heroSection.shimmerNode);
+        }
         initScrollReveal(appShell);
         if (scheduleSection) animateTimeline(scheduleSection.node);
         if (calendarSection) animateCalendarHeart(calendarSection.node);

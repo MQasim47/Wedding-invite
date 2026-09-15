@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Design/inspiration reference material (screenshots, video frames) — not
+# part of the deliverable, may be third-party content.
+/reference
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

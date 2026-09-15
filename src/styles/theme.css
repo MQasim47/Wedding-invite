@@ -1,0 +1,24 @@
+/*
+  Theme variables. Default values here mirror config.js so the page is never
+  unstyled before JS runs; applyTheme() in src/animations/theme.js overwrites
+  them at runtime from config.theme, so config.js remains the single source
+  of truth for actual colors.
+*/
+:root {
+  --color-primary: #6B1E2E;
+  --color-accent: #C9A96E;
+  --color-background: #FBF7F2;
+  --color-text: #3A2A2A;
+  --color-envelope: #8A9A7B;
+
+  --color-primary-rgb: 107, 30, 46;
+  --color-accent-rgb: 201, 169, 110;
+
+  --font-script: "Great Vibes", cursive;
+  --font-serif: "Cormorant Garamond", "Georgia", serif;
+
+  --phone-width: 430px;
+  --gutter: 24px;
+
+  --ease-elegant: cubic-bezier(0.22, 1, 0.36, 1);
+}

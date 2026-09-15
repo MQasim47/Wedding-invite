@@ -177,7 +177,7 @@ export const config = {
   // "lottie" + `src` for a Lottie JSON/.lottie file (lottie-web is only
   // ever loaded when type is "lottie"). See README for details.
   companion: {
-    enabled: true,
+    enabled: false,
     type: "svg", // "svg" | "lottie" | "image"
     src: "",
     position: "bottom-left",

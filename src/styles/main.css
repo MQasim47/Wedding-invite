@@ -88,11 +88,11 @@ svg { display: block; }
 
 .section-title-serif {
   font-family: var(--font-serif);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-size: 0.85rem;
-  color: var(--color-accent);
+  font-size: 0.95rem;
+  color: var(--color-label);
   text-align: center;
   margin-bottom: 32px;
 }
@@ -377,13 +377,16 @@ svg { display: block; }
 
 .hero-names {
   font-family: var(--font-script);
-  font-size: clamp(2.4rem, 13vw, 3.6rem);
+  font-size: clamp(2.7rem, 15vw, 4rem);
   color: var(--color-primary);
-  line-height: 1.1;
+  line-height: 1.25;
 }
 
-.hero-names .letter {
+.name-reveal {
   display: inline-block;
+  /* Extra bottom padding keeps script descenders (Aimé's é, etc.) from
+     being clipped by the clip-path reveal box during the wipe-in. */
+  padding-bottom: 0.15em;
 }
 
 .hero-ampersand {
@@ -486,6 +489,98 @@ svg { display: block; }
 }
 
 /* ---------------------------------------------------------------------- */
+/* Wedding Party                                                          */
+/* ---------------------------------------------------------------------- */
+.wedding-party { text-align: center; }
+
+.party-group { margin-top: 36px; }
+.party-group:first-of-type { margin-top: 8px; }
+
+.party-group-title {
+  font-family: var(--font-script);
+  font-size: clamp(1.7rem, 7vw, 2.1rem);
+  color: var(--color-primary);
+  margin-bottom: 22px;
+}
+
+.party-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px 16px;
+}
+
+.party-member--lead {
+  grid-column: 1 / -1;
+}
+
+.party-photo-wrap {
+  position: relative;
+  width: 92px;
+  height: 92px;
+  margin: 0 auto 10px;
+  transition: transform 0.25s var(--ease-elegant);
+}
+
+.party-member--lead .party-photo-wrap {
+  width: 122px;
+  height: 122px;
+}
+
+.party-photo-wrap:hover,
+.party-photo-wrap:active {
+  transform: translateY(-4px) scale(1.04);
+}
+
+.party-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform: rotate(-90deg);
+}
+
+.party-ring-circle {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.party-photo {
+  position: absolute;
+  inset: 9px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--color-background);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.party-photo img { width: 100%; height: 100%; object-fit: cover; }
+.party-photo svg { width: 100%; height: 100%; padding: 10%; }
+
+.party-name {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--color-text);
+}
+
+.party-member--lead .party-name { font-size: 1.1rem; }
+
+.party-role {
+  margin-top: 2px;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-label);
+}
+
+/* ---------------------------------------------------------------------- */
 /* Calendar                                                                */
 /* ---------------------------------------------------------------------- */
 .calendar-card {
@@ -511,10 +606,10 @@ svg { display: block; }
 }
 
 .calendar-weekday {
-  font-size: 0.7rem;
+  font-size: 0.82rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--color-accent);
+  color: var(--color-label);
   font-weight: 600;
   padding-bottom: 6px;
 }
@@ -607,22 +702,22 @@ svg { display: block; }
 }
 
 .timeline-event-title {
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   color: var(--color-text);
   margin-top: 2px;
 }
 
 .timeline-event-dresscode {
-  font-size: 0.82rem;
-  color: var(--color-accent);
+  font-size: 0.95rem;
+  color: var(--color-label);
   margin-top: 6px;
   font-style: italic;
 }
 
 .timeline-event-note {
-  font-size: 0.78rem;
+  font-size: 0.9rem;
   color: var(--color-text);
-  opacity: 0.7;
+  opacity: 0.85;
   margin-top: 4px;
 }
 
@@ -641,32 +736,32 @@ svg { display: block; }
 .venue-card:last-child { margin-bottom: 0; }
 
 .venue-label {
-  font-size: 0.72rem;
+  font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--color-accent);
-  font-weight: 600;
+  color: var(--color-label);
+  font-weight: 700;
   margin-bottom: 4px;
 }
 
 .venue-name {
   font-family: var(--font-script);
-  font-size: 1.6rem;
+  font-size: 1.7rem;
   color: var(--color-primary);
 }
 
 .venue-address {
   margin-top: 4px;
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: var(--color-text);
-  opacity: 0.85;
+  opacity: 0.92;
 }
 
 .venue-dresscode {
   margin-top: 10px;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   color: var(--color-text);
-  opacity: 0.85;
+  opacity: 0.92;
   font-style: italic;
 }
 
@@ -706,8 +801,8 @@ svg { display: block; }
 }
 
 .countdown-unit {
-  width: 72px;
-  height: 72px;
+  width: 78px;
+  height: 78px;
   border-radius: 50%;
   background: var(--color-primary);
   color: #fff;
@@ -725,10 +820,10 @@ svg { display: block; }
 }
 
 .countdown-label {
-  font-size: 0.55rem;
+  font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  opacity: 0.85;
+  opacity: 0.92;
 }
 
 .countdown-married {
@@ -753,9 +848,9 @@ svg { display: block; }
 /* ---------------------------------------------------------------------- */
 .rsvp-deadline {
   text-align: center;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   color: var(--color-text);
-  opacity: 0.75;
+  opacity: 0.85;
   margin-bottom: 24px;
 }
 
@@ -767,7 +862,7 @@ svg { display: block; }
 
 .field-label {
   display: block;
-  font-size: 0.8rem;
+  font-size: 0.88rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--color-primary);
@@ -869,7 +964,7 @@ svg { display: block; }
 }
 
 .rsvp-status[data-kind="error"] { color: #a02334; }
-.rsvp-status[data-kind="demo"] { color: var(--color-accent); }
+.rsvp-status[data-kind="demo"] { color: var(--color-label); }
 
 .rsvp-success {
   text-align: center;
@@ -960,8 +1055,8 @@ svg { display: block; }
 
 .closing-footer {
   margin-top: 32px;
-  font-size: 0.75rem;
-  opacity: 0.6;
+  font-size: 0.82rem;
+  opacity: 0.85;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -969,7 +1064,12 @@ svg { display: block; }
 /* ---------------------------------------------------------------------- */
 /* Utility animation classes                                              */
 /* ---------------------------------------------------------------------- */
-.fade-up { opacity: 0; transform: translateY(24px); }
+/* Content is visible by default — GSAP sets the hidden starting state itself
+   (gsap.fromTo, immediateRender) right before it animates an element in. If
+   JS errors out, a ScrollTrigger position is ever miscalculated, or fonts/
+   images shift layout before triggers are set up, the element still shows:
+   animation only ever enhances an already-visible page, never gates it. */
+.fade-up { opacity: 1; transform: none; }
 
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }

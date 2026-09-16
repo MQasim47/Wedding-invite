@@ -25,12 +25,12 @@ export const config = {
     // raw original. `position` is a CSS object-position value, tuned per
     // photo so faces stay in frame when cropped to the frame's aspect ratio.
     photo: {
-      src: "/images/couple/optimized/couple-4.webp",
+      src: "/images/couple/optimized/first-photo.webp",
       alt: {
-        en: "Dalida and Aimé, close together",
-        fr: "Dalida et Aimé, tout près l'un de l'autre",
+        en: "Dalida and Aimé in elegant black formal wear",
+        fr: "Dalida et Aimé en tenue formelle noire élégante",
       },
-      position: "center 25%",
+      position: "center",
     },
   },
 
@@ -105,6 +105,27 @@ export const config = {
     },
   ],
 
+  // Dedicated section between "Our Story" and the calendar. Leave `photo`
+  // empty for a drawn silhouette placeholder — drop a real optimized photo
+  // path in later (see couple.photo above for the pipeline). The first
+  // entry in each list is treated as Maid of Honor / Best Man and rendered
+  // larger.
+  weddingParty: {
+    enabled: true,
+    bridesmaids: [
+      { name: "Add Name", role: { en: "Maid of Honor", fr: "Demoiselle d'honneur principale" }, photo: "" },
+      { name: "Add Name", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "" },
+      { name: "Add Name", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "" },
+      { name: "Add Name", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "" },
+    ],
+    groomsmen: [
+      { name: "Add Name", role: { en: "Best Man", fr: "Témoin du marié" }, photo: "" },
+      { name: "Add Name", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "" },
+      { name: "Add Name", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "" },
+      { name: "Add Name", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "" },
+    ],
+  },
+
   closingMessage: {
     en: "Two hearts, two lives, one promise forever.",
     fr: "Deux cœurs, deux vies, une promesse pour toujours.",
@@ -119,10 +140,13 @@ export const config = {
   },
 
   music: {
-    // No licensed track yet — keep the music button hidden. Adding a file
-    // at music.src is not enough on its own once this is false.
-    enabled: false,
-    src: "/audio/placeholder.mp3",
+    // Plays track 1 first, then track 2, then loops back to track 1 —
+    // starts on the envelope tap (a real user gesture, so autoplay is never
+    // blocked) with a short fade-in. See vite.config.js for the build-time
+    // check that hides the music button entirely if a listed file is
+    // missing on disk.
+    enabled: true,
+    tracks: ["/audio/song-1.mp3", "/audio/song-2.mp3"],
   },
 
   rsvp: {
@@ -140,6 +164,11 @@ export const config = {
       // narrow viewport widths. Sources point at the optimized WebP copies
       // (see couple.photo above and README's photo pipeline section).
       images: [
+        {
+          src: "/images/couple/optimized/first-photo.webp",
+          alt: { en: "Dalida and Aimé in elegant black formal wear", fr: "Dalida et Aimé en tenue formelle noire élégante" },
+          position: "center",
+        },
         {
           src: "/images/couple/optimized/couple-1.webp",
           alt: { en: "Aimé in a formal white tuxedo", fr: "Aimé en smoking blanc" },
@@ -177,7 +206,7 @@ export const config = {
   // "lottie" + `src` for a Lottie JSON/.lottie file (lottie-web is only
   // ever loaded when type is "lottie"). See README for details.
   companion: {
-    enabled: false,
+    enabled: true,
     type: "svg", // "svg" | "lottie" | "image"
     src: "",
     position: "bottom-left",

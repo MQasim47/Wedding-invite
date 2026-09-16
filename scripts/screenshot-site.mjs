@@ -7,13 +7,17 @@
 //
 // Requires `npm run dev` NOT already running on port 5180 (this script
 // starts/stops its own instance).
-import { chromium } from "playwright";
+import { chromium, devices } from "playwright";
 import { spawn, execSync } from "node:child_process";
 import { mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
 const outDir = process.argv[2] || fileURLToPath(new URL("../reference/current-state/", import.meta.url));
 const reducedMotion = process.argv.includes("--reduced-motion");
+// Real Android Chrome emulation (UA + viewport + touch + device scale) —
+// the client reviews on an actual Pixel/Galaxy phone, not a resized desktop
+// Chrome window, so this is what --mobile-emulation matches.
+const mobileEmulation = process.argv.includes("--mobile-emulation");
 const PORT = 5180;
 
 // `shell: true` on Windows spawns npx -> node -> vite as a process tree;
@@ -62,9 +66,8 @@ let browser;
 try {
   browser = await chromium.launch();
   const context = await browser.newContext({
-    viewport: { width: 390, height: 844 },
+    ...(mobileEmulation ? devices["Pixel 7"] : { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 }),
     reducedMotion: reducedMotion ? "reduce" : "no-preference",
-    deviceScaleFactor: 2,
   });
   const page = await context.newPage();
   page.on("pageerror", (err) => console.error("[pageerror]", err.message));
@@ -74,7 +77,7 @@ try {
 
   await page.goto(`http://localhost:${PORT}/`, { waitUntil: "networkidle" });
 
-  const suffix = reducedMotion ? "-reduced-motion" : "";
+  const suffix = (mobileEmulation ? "-mobile" : "") + (reducedMotion ? "-reduced-motion" : "");
 
   // --- Envelope sequence -------------------------------------------------
   await page.screenshot({ path: `${outDir}/00-envelope-closed${suffix}.png` });
@@ -93,7 +96,7 @@ try {
   await page.screenshot({ path: `${outDir}/04-hero-settled${suffix}.png` });
 
   // --- Sections ------------------------------------------------------------
-  const sections = ["hero", "welcome", "story", "calendar", "schedule", "venue", "countdown", "gallery", "rsvp", "closing"];
+  const sections = ["hero", "welcome", "story", "wedding-party", "calendar", "schedule", "venue", "countdown", "gallery", "rsvp", "closing"];
 
   for (const id of sections) {
     const el = await page.$(`#${id}`);

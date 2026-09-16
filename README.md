@@ -44,7 +44,7 @@ touch component or animation code to update real details.
 | `venues` | Array of `{ heading: { en, fr } \| string, label: { en, fr } \| null, address, mapsUrl }` — add a third object for a third venue, it renders automatically. `label` is an optional small caps kicker above the heading (e.g. "Reception") |
 | `closingMessage` | Final sign-off message |
 | `theme` | Hex colors — the entire site's palette flows from here |
-| `music.enabled` / `music.src` | Toggle background music and its file path (see [Music](#music)) |
+| `music.enabled` / `music.tracks` | Toggle background music and its playlist (see [Music](#music)) |
 | `rsvp.enabled` | Set `false` to hide the RSVP section entirely |
 | `rsvp.deadline` | `YYYY-MM-DD`, shown above the form. Once the guest's local clock passes 23:59 on this date, the form is replaced by a closed message (both languages) instead of accepting new responses |
 | `rsvp.endpoint` | Your deployed Google Apps Script URL (see [RSVP setup](#rsvp-setup)) — leave empty for demo mode |
@@ -52,6 +52,7 @@ touch component or animation code to update real details.
 | `extras.gallery` | `{ enabled, images: [{ src, alt: { en, fr }, position }] }` — `src` must point at an optimized file (see [Couple photos](#couple-photos)) |
 | `extras.dressCode` / `extras.gifts` | Each has an `enabled` flag — set `true` and fill in the fields to show that section |
 | `companion` | The floating couple illustration that follows scroll — see [Companion illustration](#companion-illustration) |
+| `weddingParty` | `{ enabled, bridesmaids: [{ name, role: { en, fr }, photo }], groomsmen: [...] }` — the first entry in each list renders as Maid of Honor / Best Man (larger). Leave `photo` empty for a drawn silhouette placeholder; point it at an optimized file (see [Couple photos](#couple-photos)) to use a real photo |
 | `meta` | Page `<title>`, description, `ogImage` path, and `siteUrl` — these drive the SEO/Open Graph tags injected into `index.html` at build time |
 
 ### `src/i18n.js` — all UI strings
@@ -78,14 +79,17 @@ unless you also update the matching path in `config.js`:
 
 ### Music
 
-No audio file ships with this project (to avoid any copyright issues). Add a
-licensed/royalty-free track as `public/audio/placeholder.mp3` (or change
-`config.music.src` to match your filename). This is checked on disk at
-dev-server-start/build time: while no file is present, the mute/unmute
-button doesn't render at all (no broken button, no failed network request,
-no console error) — add the file and restart `npm run dev` (or rebuild) and
-the button appears automatically. Set `config.music.enabled = false` to
-remove the button regardless of whether a file is present.
+`config.music.tracks` is a playlist — track 1 plays first, then track 2,
+then it loops back to track 1. Files live in `public/audio/` (see the
+README there). Playback starts on the envelope tap (a real user gesture, so
+autoplay is never blocked) with a 2-second fade-in to ~70% volume, pauses
+automatically when the tab is hidden and resumes if it was playing, and the
+floating mute/unmute button lets guests pause manually at any time.
+
+Every track listed is checked on disk at dev-server-start/build time: if any
+is missing, the mute/unmute button doesn't render at all (no broken button,
+no failed network request, no console error). Set `config.music.enabled =
+false` to remove the button regardless of whether the files are present.
 
 ## Couple photos
 

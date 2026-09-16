@@ -14,6 +14,11 @@ export const i18n = {
     story: {
       title: "Our Story",
     },
+    weddingParty: {
+      title: "Wedding Party",
+      bridesmaids: "Bridesmaids",
+      groomsmen: "Groomsmen",
+    },
     calendar: {
       title: "Save the Date",
       weekdays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
@@ -88,6 +93,11 @@ export const i18n = {
     },
     story: {
       title: "Notre histoire",
+    },
+    weddingParty: {
+      title: "Cortège nuptial",
+      bridesmaids: "Demoiselles d'honneur",
+      groomsmen: "Garçons d'honneur",
     },
     calendar: {
       title: "Réservez la date",

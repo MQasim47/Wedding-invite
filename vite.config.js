@@ -29,9 +29,13 @@ export default defineConfig(async () => {
   // Checked on disk at build/dev-server-start time (not in the browser) so
   // the app never issues a request for a missing audio file at runtime —
   // that request would always show up as a failed-resource console error,
-  // no matter how the rejection is caught in JS.
-  const audioPath = resolve("public", config.music.src.replace(/^\/+/, ""));
-  const audioAvailable = config.music.enabled && existsSync(audioPath);
+  // no matter how the rejection is caught in JS. Every track in the
+  // playlist must exist, or the music button is hidden entirely.
+  const tracks = config.music.tracks || [];
+  const audioAvailable =
+    config.music.enabled &&
+    tracks.length > 0 &&
+    tracks.every((track) => existsSync(resolve("public", track.replace(/^\/+/, ""))));
 
   return {
     plugins: [injectMetaFromConfig()],

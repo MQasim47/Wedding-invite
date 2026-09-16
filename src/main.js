@@ -1,5 +1,6 @@
 import "./styles/main.css";
 
+import gsap from "gsap";
 import { config } from "./config.js";
 import { onLangChange } from "./utils/store.js";
 import { applyTheme } from "./animations/theme.js";
@@ -7,9 +8,10 @@ import { initSmoothScroll } from "./animations/smoothScroll.js";
 import { idlePulse, playOpenSequence } from "./animations/envelope.js";
 import { animateHero } from "./animations/hero.js";
 import { animatePendant, startChainShimmer } from "./animations/pendant.js";
-import { initScrollReveal } from "./animations/scrollReveal.js";
+import { initScrollReveal, refreshScrollTriggers } from "./animations/scrollReveal.js";
 import { animateTimeline } from "./animations/timeline.js";
 import { animateCalendarHeart } from "./animations/calendarHeart.js";
+import { animateWeddingParty } from "./animations/weddingParty.js";
 import { initCompanionAnimations } from "./animations/companion.js";
 import { el } from "./utils/dom.js";
 
@@ -20,6 +22,7 @@ import { createHeroSection } from "./sections/hero.js";
 import { createGreetingSection } from "./sections/greeting.js";
 import { createWelcomeSection } from "./sections/welcome.js";
 import { createStorySection } from "./sections/story.js";
+import { createWeddingPartySection } from "./sections/weddingParty.js";
 import { createCalendarSection } from "./sections/calendar.js";
 import { createScheduleSection } from "./sections/schedule.js";
 import { createVenueSection } from "./sections/venue.js";
@@ -31,6 +34,16 @@ import { createClosingSection } from "./sections/closing.js";
 applyTheme();
 
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// Scroll-triggered reveals (welcome text, venue cards, timeline events, …)
+// compute their trigger positions from the current layout. That layout
+// shifts as web fonts swap in and images finish decoding, so re-measure
+// every ScrollTrigger whenever either happens — otherwise a trigger set up
+// too early can end up permanently mispositioned and never fire.
+if ("fonts" in document) {
+  document.fonts.ready.then(() => refreshScrollTriggers()).catch(() => {});
+}
+window.addEventListener("load", () => refreshScrollTriggers());
 
 const app = document.getElementById("app");
 const lenis = initSmoothScroll();
@@ -54,6 +67,7 @@ const heroSection = registerSection(createHeroSection());
 registerSection(createGreetingSection());
 registerSection(createWelcomeSection());
 registerSection(createStorySection());
+const weddingPartySection = registerSection(createWeddingPartySection());
 const calendarSection = registerSection(createCalendarSection());
 const scheduleSection = registerSection(createScheduleSection());
 registerSection(createVenueSection());
@@ -88,11 +102,25 @@ onLangChange(() => {
 });
 
 // --- Audio -----------------------------------------------------------
+// Plays the configured playlist in order (track 1, then track 2, ...) and
+// loops back to the start — a single <audio> element with its src swapped
+// on "ended" rather than N elements, so only one track is ever buffered.
+const MUSIC_VOLUME = 0.7;
 let audioEl = null;
+let trackIndex = 0;
+let resumeAfterHidden = false;
+
 if (audioAvailable) {
-  audioEl = el("audio", { src: config.music.src, loop: "true", preload: "none" });
-  audioEl.volume = 0.6;
+  const tracks = config.music.tracks;
+  audioEl = el("audio", { src: tracks[0], preload: "metadata" });
+  audioEl.volume = MUSIC_VOLUME;
   document.body.appendChild(audioEl);
+
+  audioEl.addEventListener("ended", () => {
+    trackIndex = (trackIndex + 1) % tracks.length;
+    audioEl.src = tracks[trackIndex];
+    audioEl.play().catch(() => {});
+  });
 
   controls.musicBtn?.addEventListener("click", () => {
     if (!audioEl) return;
@@ -104,6 +132,20 @@ if (audioAvailable) {
   });
   audioEl.addEventListener("play", () => controls.setMusicPlaying(true));
   audioEl.addEventListener("pause", () => controls.setMusicPlaying(false));
+
+  // Pause while the tab is hidden (backgrounded/switched away) and resume
+  // only if it was actually playing before — never resurrect a track the
+  // guest had deliberately paused.
+  document.addEventListener("visibilitychange", () => {
+    if (!audioEl) return;
+    if (document.hidden) {
+      resumeAfterHidden = !audioEl.paused;
+      if (resumeAfterHidden) audioEl.pause();
+    } else if (resumeAfterHidden) {
+      resumeAfterHidden = false;
+      audioEl.play().catch(() => {});
+    }
+  });
 }
 
 // --- Envelope gate -----------------------------------------------------
@@ -114,9 +156,14 @@ sealBtn.addEventListener(
   "click",
   () => {
     if (audioEl) {
-      audioEl.play().catch(() => {
-        console.warn("[audio] Autoplay was blocked; use the mute/unmute button to start music.");
-      });
+      audioEl.volume = 0;
+      audioEl
+        .play()
+        .then(() => gsap.to(audioEl, { volume: MUSIC_VOLUME, duration: 2, ease: "sine.in" }))
+        .catch(() => {
+          audioEl.volume = MUSIC_VOLUME;
+          console.warn("[audio] Autoplay was blocked; use the mute/unmute button to start music.");
+        });
     }
 
     playOpenSequence({ screenNode: envelopeNode, flap, sealBtn, particlesEl, hintEl, pulseTween }).then(() => {
@@ -136,8 +183,15 @@ sealBtn.addEventListener(
           startChainShimmer(heroSection.shimmerNode);
         }
         initScrollReveal(appShell);
+        // The envelope gate held scroll locked (overflow:hidden + lenis.stop())
+        // up to this point, so anything ScrollTrigger measured before now used
+        // a stale layout — refresh once the page is actually scrollable, and
+        // again shortly after once the unlock/companion-reveal reflow settles.
+        refreshScrollTriggers();
+        setTimeout(refreshScrollTriggers, 400);
         if (scheduleSection) animateTimeline(scheduleSection.node);
         if (calendarSection) animateCalendarHeart(calendarSection.node);
+        if (weddingPartySection) animateWeddingParty(weddingPartySection.node);
         if (companion) {
           initCompanionAnimations({
             node: companion.node,

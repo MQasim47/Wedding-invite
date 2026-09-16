@@ -102,6 +102,32 @@ export function companionCoupleSVG() {
   </svg>`;
 }
 
+// Flat, elegant placeholder silhouette avatars for the Wedding Party
+// section — used whenever a member has no `photo` set in config. Single
+// flat tone (currentColor), hand-drawn paths, no downloaded imagery.
+// `kind` is "bridesmaid" (soft flowing hair, rounded neckline) or
+// "groomsman" (short hair, straight suit shoulders + collar notch).
+export function silhouetteAvatarSVG(kind = "bridesmaid") {
+  const isBridesmaid = kind === "bridesmaid";
+  const hair = isBridesmaid
+    ? `<path d="M32 46c-2-14 6-24 18-24s20 10 18 24c-3-3-7-5-9-3-1-9-6-14-9-14s-8 5-9 14c-2-2-6 0-9 3z" fill="currentColor" opacity="0.85" />
+       <path d="M28 60c-1-9 2-16 6-19-2 6-2 13 1 19-3 1-5 1-7 0z" fill="currentColor" opacity="0.85" />
+       <path d="M72 60c1-9-2-16-6-19 2 6 2 13-1 19 3 1 5 1 7 0z" fill="currentColor" opacity="0.85" />`
+    : `<path d="M33 42c0-11 8-19 17-19s17 8 17 19c-3-4-8-6-17-6s-14 2-17 6z" fill="currentColor" opacity="0.85" />`;
+
+  const body = isBridesmaid
+    ? `<path d="M50 66c-15 0-27 9-27 26v8h54v-8c0-17-12-26-27-26z" fill="currentColor" />
+       <path d="M50 66c-6 0-11 6-11 14 4 3 8 5 11 5s7-2 11-5c0-8-5-14-11-14z" fill="currentColor" opacity="0.7" />`
+    : `<path d="M50 66c-14 0-26 8-26 24v10h20l2-10 4 6 4-6 2 10h20V90c0-16-12-24-26-24z" fill="currentColor" />
+       <path d="M42 66l8 9 8-9" fill="none" stroke="currentColor" stroke-width="2" opacity="0.6" />`;
+
+  return `<svg viewBox="0 0 100 100" aria-hidden="true">
+    <circle cx="50" cy="40" r="18" fill="currentColor" opacity="0.9" />
+    ${hair}
+    ${body}
+  </svg>`;
+}
+
 export function envelopePattern() {
   return `<svg viewBox="0 0 200 133" xmlns="http://www.w3.org/2000/svg">
     <defs>

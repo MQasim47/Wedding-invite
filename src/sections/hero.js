@@ -3,12 +3,6 @@ import { config } from "../config.js";
 import { getLang } from "../utils/store.js";
 import { pendantChainSVG } from "../utils/icons.js";
 
-function splitLetters(text) {
-  return [...text].map((ch) =>
-    el("span", { class: "letter" }, ch === " " ? " " : ch)
-  );
-}
-
 function dateText(lang) {
   return config.weddingDateDisplay[lang] || config.weddingDateDisplay.en;
 }
@@ -18,9 +12,17 @@ function taglineText(lang) {
 }
 
 export function createHeroSection() {
-  const name1 = el("span", { class: "hero-name-1" }, splitLetters(config.couple.partner1));
+  const name1 = el(
+    "span",
+    { class: "hero-name-1 name-reveal", style: "visibility: hidden;" },
+    config.couple.partner1
+  );
   const amp = el("span", { class: "hero-ampersand" }, "&");
-  const name2 = el("span", { class: "hero-name-2" }, splitLetters(config.couple.partner2));
+  const name2 = el(
+    "span",
+    { class: "hero-name-2 name-reveal", style: "visibility: hidden;" },
+    config.couple.partner2
+  );
 
   const taglineEl = el("p", { class: "hero-tagline" }, taglineText(getLang()));
   const dateEl = el("p", { class: "hero-date" }, dateText(getLang()));

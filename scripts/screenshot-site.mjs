@@ -113,20 +113,25 @@ try {
   }
 
   // --- Timeline scroll positions (for the traveling-heart comparison) -----
-  const timeline = await page.$("#schedule .timeline");
-  if (timeline) {
-    const box = await timeline.boundingBox();
-    if (box) {
-      for (const [label, fraction] of [["25pct", 0.25], ["50pct", 0.5], ["75pct", 0.75]]) {
-        await page.evaluate(
-          ({ top, height, fraction }) => {
-            window.scrollTo(0, top + window.scrollY - window.innerHeight / 2 + height * fraction);
-          },
-          { top: box.y, height: box.height, fraction }
-        );
-        await page.waitForTimeout(400);
-        await page.screenshot({ path: `${outDir}/timeline-${label}${suffix}.png` });
-      }
+  // Re-measure the bounding box fresh on every iteration — box.y is
+  // viewport-relative, so reusing one captured before the loop and adding
+  // the (now-changed) window.scrollY on later iterations drifts further
+  // off target each time.
+  const timelineExists = (await page.$("#schedule .timeline")) !== null;
+  if (timelineExists) {
+    for (const [label, fraction] of [["25pct", 0.25], ["50pct", 0.5], ["75pct", 0.75]]) {
+      const box = await page.$eval("#schedule .timeline", (el) => {
+        const r = el.getBoundingClientRect();
+        return { top: r.top, height: r.height };
+      });
+      await page.evaluate(
+        ({ top, height, fraction }) => {
+          window.scrollTo(0, window.scrollY + top - window.innerHeight / 2 + height * fraction);
+        },
+        { ...box, fraction }
+      );
+      await page.waitForTimeout(400);
+      await page.screenshot({ path: `${outDir}/timeline-${label}${suffix}.png` });
     }
   }
 

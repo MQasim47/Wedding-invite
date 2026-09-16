@@ -54,12 +54,15 @@ export function createScheduleSection() {
 
   const eventsWrap = el("div", { class: "timeline-events" }, entries.map((entry) => entry.node));
   const svgWrap = fromHTML(buildCurveSVG(config.schedule.length));
+  const heart = el("div", { class: "timeline-heart", "aria-hidden": "true" }, [
+    el("span", { html: icons.heartSolid }),
+  ]);
 
   const sectionTitle = el("h2", { class: "section-title-serif" }, t().schedule.title);
 
   const node = el("section", { class: "section", id: "schedule" }, [
     sectionTitle,
-    el("div", { class: "timeline" }, [svgWrap, eventsWrap]),
+    el("div", { class: "timeline" }, [svgWrap, eventsWrap, heart]),
   ]);
 
   function updateLang() {

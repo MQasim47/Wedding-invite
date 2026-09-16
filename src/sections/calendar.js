@@ -3,62 +3,58 @@ import { config } from "../config.js";
 import { t } from "../utils/store.js";
 import { icons } from "../utils/icons.js";
 
-// Reads the calendar date directly from the ISO string's own date digits,
-// rather than constructing a Date and calling local getters on it — those
-// apply the *browser's* timezone to the instant and can roll the date over
-// to the next/previous day for a guest far from weddingDate's own offset
-// (e.g. a -05:00 evening event reads as the next day for anyone east of
-// it). The wedding's calendar date should be the same for every guest.
+// Reads the calendar date directly from the ISO string's own date digits
+// (see the matching comment in sections/hero.js) so it can't roll over to
+// the next/previous day for a guest in a different timezone.
 function weddingDateParts() {
   const match = config.weddingDate.match(/^(\d{4})-(\d{2})-(\d{2})/);
   const [, y, m, d] = match;
   return { year: Number(y), month: Number(m) - 1, day: Number(d) };
 }
 
-function buildGrid() {
-  const { year, month, day: weddingDay } = weddingDateParts();
-
-  const firstWeekday = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-  const cells = [];
-  for (let i = 0; i < firstWeekday; i++) {
-    cells.push(el("div", { class: "calendar-day", "aria-hidden": "true" }));
+// The single week (Sun-Sat) containing the wedding day — not the whole
+// month grid. Days that spill into the previous/next month still show
+// their real numbers (normal calendar-strip behavior).
+function weekRow() {
+  const { year, month, day } = weddingDateParts();
+  const base = new Date(year, month, day);
+  const startOffset = base.getDay();
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(year, month, day - startOffset + i);
+    days.push({ dayNum: d.getDate(), isWedding: i === startOffset });
   }
-  for (let day = 1; day <= daysInMonth; day++) {
-    const isWedding = day === weddingDay;
-    const cell = el(
-      "div",
-      { class: "calendar-day", "data-wedding": isWedding ? "true" : "false" },
-      [
-        String(day),
-        isWedding
-          ? el("span", { class: "calendar-day-heart", html: icons.heartOutlineDraw })
-          : null,
-      ]
-    );
-    cells.push(cell);
-  }
-  return { cells, year, month };
+  return days;
 }
 
 export function createCalendarSection() {
   const monthLabel = el("p", { class: "calendar-month" });
-  const dayGrid = el("div", { class: "calendar-grid" });
+  const weekRowEl = el("div", { class: "calendar-week-row" });
 
   function render() {
-    const { cells, year, month } = buildGrid();
+    const { month, year } = weddingDateParts();
     monthLabel.textContent = `${t().calendar.months[month]} ${year}`;
-    dayGrid.replaceChildren(
-      ...t().calendar.weekdays.map((w) => el("div", { class: "calendar-weekday" }, w)),
-      ...cells
+    weekRowEl.replaceChildren(
+      ...weekRow().map((entry, i) =>
+        el("div", { class: "calendar-week-day" }, [
+          el("span", { class: "calendar-weekday" }, t().calendar.weekdays[i]),
+          entry.isWedding
+            ? el("span", { class: "calendar-day-heart" }, [
+                el("span", { class: "calendar-day-heart-icon", html: icons.heartSolid }),
+                el("span", { class: "calendar-day-heart-num" }, String(entry.dayNum)),
+              ])
+            : el("span", { class: "calendar-day-num" }, String(entry.dayNum)),
+        ])
+      )
     );
   }
   render();
 
   const node = el("section", { class: "section calendar", id: "calendar" }, [
     el("h2", { class: "section-title-serif" }, t().calendar.title),
-    el("div", { class: "calendar-card" }, [monthLabel, dayGrid]),
+    monthLabel,
+    weekRowEl,
+    el("div", { class: "lace-ribbon", "aria-hidden": "true" }),
   ]);
 
   function updateLang() {

@@ -140,3 +140,74 @@ export function envelopePattern() {
     <rect width="200" height="133" fill="url(#floral)" />
   </svg>`;
 }
+
+// Scalloped wax-seal rim (a real wax seal's pressed edge, not a plain
+// circle) in a warm peach/blush gradient. `initials` renders as separate
+// HTML on top (see .envelope-seal-initials) so it stays crisp text, not
+// baked into the SVG.
+export function sealScallopSVG() {
+  const bumps = 20;
+  const cx = 50;
+  const cy = 50;
+  const rOuter = 44;
+  const rInner = 40.5;
+  let d = "";
+  for (let i = 0; i <= bumps * 2; i++) {
+    const angle = (i / (bumps * 2)) * Math.PI * 2;
+    const r = i % 2 === 0 ? rOuter : rInner;
+    const x = (cx + r * Math.cos(angle)).toFixed(2);
+    const y = (cy + r * Math.sin(angle)).toFixed(2);
+    d += (i === 0 ? "M" : "L") + x + "," + y + " ";
+  }
+  d += "Z";
+
+  return `<svg class="envelope-seal-shape" viewBox="0 0 100 100" aria-hidden="true">
+    <defs>
+      <radialGradient id="seal-blush" cx="35%" cy="28%" r="80%">
+        <stop offset="0%" stop-color="#ffe8d6" />
+        <stop offset="55%" stop-color="#f0b48d" />
+        <stop offset="100%" stop-color="#cf8a5f" />
+      </radialGradient>
+    </defs>
+    <path d="${d}" fill="url(#seal-blush)" />
+  </svg>`;
+}
+
+// Debossed-looking floral vine spray for the envelope's side panels — a
+// stem with alternating leaf pairs, drawn as a dark "pressed-in" stroke
+// plus a light highlight fill on each leaf to fake an embossed relief
+// (approximated with a paired drop-shadow in CSS rather than a full SVG
+// lighting filter — simpler, and reads the same at this size).
+export function envelopeVineSVG() {
+  return `<svg class="envelope-vine-svg" viewBox="0 0 60 220" aria-hidden="true">
+    <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity="0.55">
+      <path d="M30 6 C 27 50, 33 92, 27 132 S 31 190, 29 214" />
+      <path d="M30 38 C 20 32, 10 34, 4 28" />
+      <path d="M30 38 C 40 32, 50 34, 56 28" />
+      <path d="M28 78 C 18 72, 8 74, 2 68" />
+      <path d="M28 78 C 38 72, 48 74, 54 68" />
+      <path d="M27 118 C 17 112, 7 114, 1 108" />
+      <path d="M27 118 C 37 112, 47 114, 53 108" />
+      <path d="M27 158 C 17 152, 8 156, 3 150" />
+      <path d="M27 158 C 37 152, 47 156, 52 150" />
+    </g>
+    <g fill="currentColor" opacity="0.3">
+      <circle cx="6" cy="26" r="4" /><circle cx="54" cy="26" r="4" />
+      <circle cx="4" cy="66" r="4" /><circle cx="52" cy="66" r="4" />
+      <circle cx="3" cy="106" r="4" /><circle cx="51" cy="106" r="4" />
+      <circle cx="4" cy="148" r="4" /><circle cx="50" cy="148" r="4" />
+    </g>
+  </svg>`;
+}
+
+// Two crossing corner-to-corner diagonals — the classic envelope-flap X
+// seam. Drawn as an SVG with preserveAspectRatio="none" so the lines stay
+// pinned exactly to the four corners at any box aspect ratio, and
+// vector-effect="non-scaling-stroke" keeps the stroke a constant width
+// despite the non-uniform scale that requires.
+export function envelopeFoldLinesSVG() {
+  return `<svg class="envelope-fold-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+    <line x1="0" y1="0" x2="100" y2="100" vector-effect="non-scaling-stroke" />
+    <line x1="100" y1="0" x2="0" y2="100" vector-effect="non-scaling-stroke" />
+  </svg>`;
+}

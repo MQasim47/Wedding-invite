@@ -82,7 +82,10 @@ try {
   // --- Envelope sequence -------------------------------------------------
   await page.screenshot({ path: `${outDir}/00-envelope-closed${suffix}.png` });
 
-  await page.click(".envelope-seal-btn");
+  // force: true — the seal has a continuous idle pulse (scale yoyo), so its
+  // bounding box never "settles" by Playwright's actionability definition.
+  // That's intentional UI, not a bug; a real tap doesn't care.
+  await page.click(".envelope-seal-btn", { force: true });
   await page.waitForTimeout(300);
   await page.screenshot({ path: `${outDir}/01-envelope-t300ms${suffix}.png` });
 

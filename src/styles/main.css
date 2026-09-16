@@ -121,43 +121,90 @@ svg { display: block; }
   position: fixed;
   inset: 0;
   z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--color-envelope);
+  overflow: hidden;
 }
 
 .envelope-screen[data-open="true"] {
   pointer-events: none;
 }
 
+/* Full-bleed — fills the whole viewport, no card margin. */
 .envelope-box {
-  position: relative;
-  width: min(86vw, 360px);
-  aspect-ratio: 3 / 2;
+  position: absolute;
+  inset: 0;
 }
 
 .envelope-back {
   position: absolute;
   inset: 0;
-  background: color-mix(in srgb, var(--color-envelope) 85%, black 10%);
-  border-radius: 6px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
-  overflow: hidden;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 50% 38%, color-mix(in srgb, var(--color-envelope) 100%, white 6%), transparent 70%),
+    var(--color-envelope);
 }
 
-.envelope-back svg { width: 100%; height: 100%; opacity: 0.5; }
+/* The classic envelope-flap X seam — see envelopeFoldLinesSVG(). */
+.envelope-fold-lines {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+}
+.envelope-fold-lines line { stroke: rgba(0, 0, 0, 0.16); stroke-width: 1; }
 
+.envelope-vine {
+  position: absolute;
+  top: 50%;
+  width: 56px;
+  height: 58%;
+  transform: translateY(-50%);
+  color: #000;
+  z-index: 1;
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.3)) drop-shadow(0 -1px 0.5px rgba(0, 0, 0, 0.25));
+}
+.envelope-vine-svg { width: 100%; height: 100%; display: block; }
+.envelope-vine-left { left: 8%; }
+.envelope-vine-right { right: 8%; transform: translateY(-50%) scaleX(-1); }
+
+/* Top flap — a triangle whose apex sits at the exact vertical/horizontal
+   center of the screen, matching where the two fold lines above cross. */
 .envelope-flap {
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 62%;
-  transform-origin: top center;
-  will-change: transform; /* pre-promote to its own layer for the scaleY open animation, combined with clip-path below */
+  height: 50%;
   clip-path: polygon(0 0, 100% 0, 50% 100%);
   background: linear-gradient(160deg, var(--color-envelope), color-mix(in srgb, var(--color-envelope) 70%, black 15%));
   z-index: 3;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+/* Golden glow revealed inside the V once the flap moves away — same
+   position/shape as the flap so there's no seam when it's uncovered. */
+.envelope-glow {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 50%;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  background: radial-gradient(circle at 50% 15%, #ffdf9e, #f2a94f 55%, transparent 78%);
+  z-index: 2;
+  opacity: 0;
+}
+
+.envelope-sparkle-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.envelope-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .envelope-seal {
@@ -165,58 +212,50 @@ svg { display: block; }
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 84px;
-  height: 84px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, var(--color-accent), var(--color-primary) 75%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 92px;
+  height: 92px;
   z-index: 5;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3);
-  color: #fff;
-  font-family: var(--font-script);
-  font-size: 1.6rem;
 }
 
 .envelope-seal-btn {
   all: unset;
   cursor: pointer;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   height: 100%;
-  border-radius: 50%;
+}
+
+.envelope-seal-shape {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
+}
+
+.envelope-seal-initials {
+  position: relative;
+  color: #7a3f1d;
+  font-family: var(--font-script);
+  font-size: 1.7rem;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
 .envelope-hint {
   position: absolute;
-  bottom: -48px;
+  top: calc(50% + 62px);
   left: 50%;
   transform: translateX(-50%);
-  color: #fff;
-  font-size: 0.85rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.85;
+  color: rgba(255, 255, 255, 0.92);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
   white-space: nowrap;
-}
-
-.envelope-particles {
-  position: absolute;
-  inset: -20% -20%;
-  pointer-events: none;
-  z-index: 10;
-}
-
-.particle {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--color-accent);
-  opacity: 0;
+  z-index: 5;
 }
 
 /* ---------------------------------------------------------------------- */

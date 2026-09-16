@@ -6,7 +6,7 @@
 export const i18n = {
   en: {
     envelope: {
-      hint: "Tap to open",
+      hint: "(tap to open)",
     },
     greeting: {
       dear: "Dear",
@@ -86,7 +86,7 @@ export const i18n = {
 
   fr: {
     envelope: {
-      hint: "Touchez pour ouvrir",
+      hint: "(touchez pour ouvrir)",
     },
     greeting: {
       dear: "Cher/Chère",

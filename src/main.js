@@ -11,6 +11,8 @@ import { animatePendant, startChainShimmer } from "./animations/pendant.js";
 import { initScrollReveal, refreshScrollTriggers } from "./animations/scrollReveal.js";
 import { animateTimeline } from "./animations/timeline.js";
 import { animateCalendarHeart } from "./animations/calendarHeart.js";
+import { animateFlowerBand } from "./animations/flowerBand.js";
+import { animateClosing } from "./animations/closing.js";
 import { animateWeddingParty } from "./animations/weddingParty.js";
 import { initCompanionAnimations } from "./animations/companion.js";
 import { el } from "./utils/dom.js";
@@ -27,6 +29,7 @@ import { createCalendarSection } from "./sections/calendar.js";
 import { createScheduleSection } from "./sections/schedule.js";
 import { createVenueSection } from "./sections/venue.js";
 import { createCountdownSection } from "./sections/countdown.js";
+import { createFlowerBandSection } from "./sections/flowerBand.js";
 import { createRsvpSection } from "./sections/rsvp.js";
 import { createExtrasSections } from "./sections/extras.js";
 import { createClosingSection } from "./sections/closing.js";
@@ -72,9 +75,10 @@ const calendarSection = registerSection(createCalendarSection());
 const scheduleSection = registerSection(createScheduleSection());
 registerSection(createVenueSection());
 registerSection(createCountdownSection());
+const flowerBand = registerSection(createFlowerBandSection());
 registerSection(createRsvpSection());
 createExtrasSections().forEach(registerSection);
-registerSection(createClosingSection());
+const closingSection = registerSection(createClosingSection());
 
 // __AUDIO_AVAILABLE__ is a build-time constant (see vite.config.js) — true
 // only when config.music.enabled AND the configured file actually exists on
@@ -193,6 +197,8 @@ sealBtn.addEventListener(
         if (scheduleSection) animateTimeline(scheduleSection.node);
         if (calendarSection) animateCalendarHeart(calendarSection.node);
         if (weddingPartySection) animateWeddingParty(weddingPartySection.node);
+        if (flowerBand) animateFlowerBand(flowerBand.node);
+        if (closingSection) animateClosing(closingSection);
         if (companion) {
           initCompanionAnimations({
             node: companion.node,

@@ -117,11 +117,15 @@ function initClosingFlyIn(node) {
 function flyToClosing(node) {
   node.dataset.flying = "true";
   node.style.pointerEvents = "";
+  // Lands upper-right and modestly scaled — the closing section's names
+  // and wax-seal heart are a centered column, so the companion stays out
+  // of their way by hugging the right edge near the top of the section
+  // instead of drifting toward the middle.
   gsap.to(node, {
     opacity: 1,
-    x: 120,
-    y: -260,
-    scale: 1.7,
+    x: 210,
+    y: -430,
+    scale: 1.3,
     duration: 0.9,
     ease: "power2.out",
     overwrite: "auto",

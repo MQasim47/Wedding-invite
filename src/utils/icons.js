@@ -369,6 +369,66 @@ export function hallIllustrationSVG() {
   </svg>`;
 }
 
+// Dense wine/burgundy dahlia-bloom band — a placeholder for a real
+// photographic floral strip (see NOTES.md asset list), acting as a rich
+// section divider before RSVP. Each "bloom" is a ring of overlapping
+// petal ellipses around a dark center, tiled with jitter so the repeat
+// isn't obvious at a glance.
+export function dahliaBandSVG() {
+  function bloom(cx, cy, r, tone) {
+    const petals = 10;
+    let out = "";
+    for (let i = 0; i < petals; i++) {
+      const angle = (i / petals) * Math.PI * 2;
+      const px = cx + Math.cos(angle) * r * 0.55;
+      const py = cy + Math.sin(angle) * r * 0.55;
+      out += `<ellipse cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" rx="${(r * 0.5).toFixed(1)}" ry="${(r * 0.32).toFixed(1)}" transform="rotate(${((angle * 180) / Math.PI).toFixed(1)} ${px.toFixed(1)} ${py.toFixed(1)})" fill="${tone}" />`;
+    }
+    out += `<circle cx="${cx}" cy="${cy}" r="${r * 0.28}" fill="#2a0f14" opacity="0.8" />`;
+    return out;
+  }
+
+  const tones = ["#5c1420", "#7a1c2b", "#4a0f1a", "#6e1826"];
+  let blooms = "";
+  const positions = [
+    [40, 55, 34], [110, 35, 30], [175, 60, 36], [235, 30, 28], [300, 55, 34],
+    [365, 32, 30], [70, 20, 24], [150, 22, 22], [265, 22, 24], [335, 20, 22],
+  ];
+  positions.forEach(([x, y, r], i) => {
+    blooms += bloom(x, y, r, tones[i % tones.length]);
+  });
+  // A few metallic/glitter highlight flecks.
+  const flecks = Array.from({ length: 14 }, () => {
+    const x = (Math.random() * 400).toFixed(1);
+    const y = (Math.random() * 90).toFixed(1);
+    return `<circle cx="${x}" cy="${y}" r="1.4" fill="#e8c98a" opacity="${(0.4 + Math.random() * 0.4).toFixed(2)}" />`;
+  }).join("");
+
+  return `<svg class="dahlia-band-svg" viewBox="0 0 400 90" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <rect width="400" height="90" fill="#3a0d16" />
+    ${blooms}
+    ${flecks}
+  </svg>`;
+}
+
+// Glossy 3D-look burgundy wax-seal heart for the closing section — a
+// radial-gradient fill (light highlight upper-left, dark burgundy edges)
+// plus a small white gloss ellipse overlay, standing in for the reference's
+// raised/highlighted wax-seal heart rather than a flat outline icon.
+export function waxSealHeartSVG() {
+  return `<svg class="wax-seal-heart-svg" viewBox="0 0 100 100" aria-hidden="true">
+    <defs>
+      <radialGradient id="wax-heart-grad" cx="34%" cy="28%" r="75%">
+        <stop offset="0%" stop-color="#c14a5e" />
+        <stop offset="45%" stop-color="#8a2438" />
+        <stop offset="100%" stop-color="#5c1424" />
+      </radialGradient>
+    </defs>
+    <path d="M50 88s-30-18.7-39.6-37.5C4.3 39.6 8.3 24 21 24c8.3 0 14.6 5 17.9 10.6C42.2 29 48.5 24 56.8 24c12.7 0 16.7 15.6 10.6 26.5C58.2 69.3 50 88 50 88z" fill="url(#wax-heart-grad)" />
+    <ellipse cx="36" cy="38" rx="10" ry="6" fill="#fff" opacity="0.35" transform="rotate(-30 36 38)" />
+  </svg>`;
+}
+
 // Two crossing corner-to-corner diagonals — the classic envelope-flap X
 // seam. Drawn as an SVG with preserveAspectRatio="none" so the lines stay
 // pinned exactly to the four corners at any box aspect ratio, and

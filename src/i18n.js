@@ -40,6 +40,7 @@ export const i18n = {
     },
     countdown: {
       title: "Counting Down",
+      heading: "Until the wedding:",
       days: "Days",
       hours: "Hours",
       minutes: "Minutes",
@@ -76,6 +77,8 @@ export const i18n = {
       giftsTitle: "Gifts",
     },
     closing: {
+      withLove: "With love,",
+      waitingForYou: "We're waiting for you!",
       footer: "Made with love",
     },
     music: {
@@ -124,6 +127,7 @@ export const i18n = {
     },
     countdown: {
       title: "Compte à rebours",
+      heading: "Avant le mariage :",
       days: "Jours",
       hours: "Heures",
       minutes: "Minutes",
@@ -160,6 +164,8 @@ export const i18n = {
       giftsTitle: "Cadeaux",
     },
     closing: {
+      withLove: "Avec amour,",
+      waitingForYou: "Nous vous attendons !",
       footer: "Fait avec amour",
     },
     music: {

@@ -33,9 +33,12 @@ export function createCountdownSection() {
   const marriedWrap = el("div", { class: "countdown-married", hidden: true }, [marriedTitle, marriedSub]);
 
   const sectionTitle = el("h2", { class: "section-title-serif" }, t().countdown.title);
+  const heading = el("p", { class: "countdown-heading" }, t().countdown.heading);
 
   const node = el("section", { class: "section", id: "countdown" }, [
+    el("div", { class: "lace-ribbon", "aria-hidden": "true" }),
     sectionTitle,
+    heading,
     grid,
     marriedWrap,
     icsBtn,
@@ -53,19 +56,18 @@ export function createCountdownSection() {
     marriedWrap.hidden = true;
 
     const next = { days, hours, minutes, seconds };
-    if (!lastValues || lastValues.seconds !== seconds) {
-      daysVal.textContent = String(days).padStart(2, "0");
-      hoursVal.textContent = String(hours).padStart(2, "0");
-      minutesVal.textContent = String(minutes).padStart(2, "0");
-      secondsVal.textContent = String(seconds).padStart(2, "0");
 
-      if (!prefersReducedMotion) {
-        gsap.fromTo(
-          secondsVal,
-          { opacity: 0.3, y: -4 },
-          { opacity: 1, y: 0, duration: 0.3, ease: "power1.out" }
-        );
-      }
+    function softTransition(el, text) {
+      el.textContent = text;
+      if (prefersReducedMotion) return;
+      gsap.fromTo(el, { opacity: 0.3, y: -4 }, { opacity: 1, y: 0, duration: 0.3, ease: "power1.out" });
+    }
+
+    if (!lastValues || lastValues.seconds !== seconds) {
+      softTransition(secondsVal, String(seconds).padStart(2, "0"));
+      if (!lastValues || lastValues.minutes !== minutes) softTransition(minutesVal, String(minutes).padStart(2, "0"));
+      if (!lastValues || lastValues.hours !== hours) softTransition(hoursVal, String(hours).padStart(2, "0"));
+      if (!lastValues || lastValues.days !== days) softTransition(daysVal, String(days).padStart(2, "0"));
     }
     lastValues = next;
   }
@@ -74,6 +76,7 @@ export function createCountdownSection() {
 
   function updateLang() {
     sectionTitle.textContent = t().countdown.title;
+    heading.textContent = t().countdown.heading;
     daysLabel.textContent = t().countdown.days;
     hoursLabel.textContent = t().countdown.hours;
     minutesLabel.textContent = t().countdown.minutes;

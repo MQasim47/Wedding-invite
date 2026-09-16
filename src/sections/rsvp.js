@@ -69,9 +69,15 @@ export function createRsvpSection() {
   });
 
   const attendingLabel = el("p", { class: "field-label" }, t().rsvp.attending);
-  const yesBtn = el("button", { class: "attending-option", type: "button", "aria-pressed": "false" }, t().rsvp.attendingYes);
-  const noBtn = el("button", { class: "attending-option", type: "button", "aria-pressed": "false" }, t().rsvp.attendingNo);
-  const attendingGroup = el("div", { class: "attending-group" }, [yesBtn, noBtn]);
+  const yesBtn = el("button", { class: "attending-option", type: "button", role: "radio", "aria-checked": "false" }, [
+    el("span", { class: "radio-dot" }),
+    el("span", {}, t().rsvp.attendingYes),
+  ]);
+  const noBtn = el("button", { class: "attending-option", type: "button", role: "radio", "aria-checked": "false" }, [
+    el("span", { class: "radio-dot" }),
+    el("span", {}, t().rsvp.attendingNo),
+  ]);
+  const attendingGroup = el("div", { class: "attending-group", role: "radiogroup" }, [yesBtn, noBtn]);
   const attendingError = el("p", { class: "field-error" });
 
   const guestsLabel = el("label", { class: "field-label" }, t().rsvp.guests);
@@ -109,7 +115,10 @@ export function createRsvpSection() {
   const successMsg = el("p", {}, t().rsvp.successMessage);
   const successWrap = el("div", { class: "rsvp-success", hidden: true }, [successCheck, successTitle, successMsg]);
 
-  const node = el("section", { class: "section", id: "rsvp" }, [
+  const watermark = el("div", { class: "rsvp-watermark", "aria-hidden": "true" }, t().rsvp.title);
+
+  const node = el("section", { class: "section rsvp-section", id: "rsvp" }, [
+    watermark,
     sectionTitle,
     deadlineEl,
     form,
@@ -118,8 +127,8 @@ export function createRsvpSection() {
 
   function setAttending(value) {
     attending = value;
-    yesBtn.setAttribute("aria-pressed", String(value === "yes"));
-    noBtn.setAttribute("aria-pressed", String(value === "no"));
+    yesBtn.setAttribute("aria-checked", String(value === "yes"));
+    noBtn.setAttribute("aria-checked", String(value === "no"));
     guestsWrap.hidden = value !== "yes";
     attendingError.textContent = "";
   }
@@ -220,12 +229,13 @@ export function createRsvpSection() {
 
   function updateLang() {
     sectionTitle.textContent = t().rsvp.title;
+    watermark.textContent = t().rsvp.title;
     deadlineEl.textContent = `${t().rsvp.deadlinePrefix} ${formatDeadline(getLang())}.`;
     nameLabel.textContent = t().rsvp.name;
     nameInput.placeholder = t().rsvp.namePlaceholder;
     attendingLabel.textContent = t().rsvp.attending;
-    yesBtn.textContent = t().rsvp.attendingYes;
-    noBtn.textContent = t().rsvp.attendingNo;
+    yesBtn.lastChild.textContent = t().rsvp.attendingYes;
+    noBtn.lastChild.textContent = t().rsvp.attendingNo;
     guestsLabel.textContent = t().rsvp.guests;
     messageLabel.textContent = t().rsvp.message;
     messageInput.placeholder = t().rsvp.messagePlaceholder;

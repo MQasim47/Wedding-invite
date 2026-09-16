@@ -53,7 +53,12 @@ function buildVenueCard(venue, index) {
 
 export function createVenueSection() {
   const built = config.venues.map(buildVenueCard);
-  const cardsWrap = el("div", {}, built.map((entry) => entry.card));
+  const cards = built.map((entry) => entry.card);
+  // A lace ribbon divider between each venue card (not after the last one).
+  const interleaved = cards.flatMap((card, i) =>
+    i === 0 ? [card] : [el("div", { class: "lace-ribbon", "aria-hidden": "true" }), card]
+  );
+  const cardsWrap = el("div", {}, interleaved);
 
   const sectionTitle = el("h2", { class: "section-title-serif" }, t().venue.title);
 

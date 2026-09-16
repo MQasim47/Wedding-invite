@@ -11,6 +11,9 @@ export const i18n = {
     greeting: {
       dear: "Dear",
     },
+    welcome: {
+      heading: "Dear guests!",
+    },
     story: {
       title: "Our Story",
     },
@@ -22,6 +25,7 @@ export const i18n = {
     calendar: {
       title: "Save the Date",
       weekdays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+      weekdaysFull: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
       months: [
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December",
@@ -91,6 +95,9 @@ export const i18n = {
     greeting: {
       dear: "Cher/Chère",
     },
+    welcome: {
+      heading: "Chers invités !",
+    },
     story: {
       title: "Notre histoire",
     },
@@ -102,6 +109,7 @@ export const i18n = {
     calendar: {
       title: "Réservez la date",
       weekdays: ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"],
+      weekdaysFull: ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
       months: [
         "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
         "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre",

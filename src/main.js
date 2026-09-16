@@ -6,7 +6,7 @@ import { onLangChange } from "./utils/store.js";
 import { applyTheme } from "./animations/theme.js";
 import { initSmoothScroll } from "./animations/smoothScroll.js";
 import { idlePulse, playOpenSequence } from "./animations/envelope.js";
-import { animateHero } from "./animations/hero.js";
+import { animateHero, animateHeroExtras } from "./animations/hero.js";
 import { animatePendant, startChainShimmer } from "./animations/pendant.js";
 import { initScrollReveal, refreshScrollTriggers } from "./animations/scrollReveal.js";
 import { animateTimeline } from "./animations/timeline.js";
@@ -181,6 +181,7 @@ sealBtn.addEventListener(
           animateHero(heroSection.node);
           animatePendant(heroSection.pendantNode);
           startChainShimmer(heroSection.shimmerNode);
+          animateHeroExtras(heroSection);
         }
         initScrollReveal(appShell);
         // The envelope gate held scroll locked (overflow:hidden + lenis.stop())

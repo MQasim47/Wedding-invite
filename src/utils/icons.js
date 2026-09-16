@@ -200,6 +200,174 @@ export function envelopeVineSVG() {
   </svg>`;
 }
 
+// Generic scalloped closed-curve path generator — an ellipse whose radius
+// alternates between two values around its circumference, used for both
+// the wax seal (rx === ry) and the welcome lace doily (rx !== ry).
+// `archBoost` optionally pushes the topmost point out further, for the
+// doily's small pointed arch at top-center.
+function scallopPath(cx, cy, rx, ry, bumps, ampRatio, archBoost = 0) {
+  let d = "";
+  const steps = bumps * 2;
+  for (let i = 0; i <= steps; i++) {
+    const angle = (i / steps) * Math.PI * 2 - Math.PI / 2;
+    let r = i % 2 === 0 ? 1 : 1 - ampRatio;
+    if (archBoost && Math.abs(angle + Math.PI / 2) < 0.18) r += archBoost;
+    const x = (cx + rx * r * Math.cos(angle)).toFixed(2);
+    const y = (cy + ry * r * Math.sin(angle)).toFixed(2);
+    d += (i === 0 ? "M" : "L") + x + "," + y + " ";
+  }
+  return d + "Z";
+}
+
+// Burgundy scalloped/baroque cartouche behind the hero names badge — a
+// rounded plaque with concave "ear" notches carved into each corner.
+// Notches are drawn as circles filled to match the page background
+// (simpler and lighter than a true SVG compositing cutout, and reads
+// identically since the hero section sits on a flat, untextured cream
+// background right where the badge lives).
+export function badgeCartoucheSVG() {
+  return `<svg class="hero-badge-svg" viewBox="0 0 100 66" preserveAspectRatio="none" aria-hidden="true">
+    <rect x="1.5" y="1.5" width="97" height="63" rx="13" ry="18" fill="var(--color-primary)" />
+    <circle cx="1.5" cy="1.5" r="8" fill="var(--color-background)" />
+    <circle cx="98.5" cy="1.5" r="8" fill="var(--color-background)" />
+    <circle cx="1.5" cy="64.5" r="8" fill="var(--color-background)" />
+    <circle cx="98.5" cy="64.5" r="8" fill="var(--color-background)" />
+  </svg>`;
+}
+
+// Beige/cream lace-doily frame behind the welcome message — fully
+// scalloped border all the way around, like a real paper doily, with a
+// small pointed arch at the top.
+export function laceDoilySVG() {
+  const outer = scallopPath(50, 52, 46, 48, 22, 0.09, 0.05);
+  const inner = scallopPath(50, 52, 40, 42, 22, 0.07, 0.03);
+  return `<svg class="welcome-doily-svg" viewBox="0 0 100 104" preserveAspectRatio="none" aria-hidden="true">
+    <path d="${outer}" fill="#f6efe2" stroke="rgba(var(--color-accent-rgb), 0.55)" stroke-width="0.6" />
+    <path d="${inner}" fill="none" stroke="rgba(var(--color-accent-rgb), 0.4)" stroke-width="0.4" />
+  </svg>`;
+}
+
+// Small flying hummingbird — side profile, wings spread, iridescent body.
+export function hummingbirdSVG() {
+  return `<svg class="hummingbird-svg" viewBox="0 0 60 40" aria-hidden="true">
+    <path d="M4 20c6-3 12-2 16 2 2-8 8-14 16-14-4 5-6 10-5 15 4-1 8 0 11 3-5 2-10 2-14 0-3 3-8 4-12 2 3 3 3 6 0 8-2-3-6-4-9-3 2-3 1-7-3-8-4-1-8-3-10-5z" fill="#2f7a5c" />
+    <circle cx="34" cy="17" r="1.6" fill="#1a2e26" />
+    <path d="M34 15c4-2 8-2 11 0-3 1-7 1-11 0z" fill="#c9a96e" opacity="0.7" />
+  </svg>`;
+}
+
+// Cascading wisteria-style floral vine (pink/cream), for the hero badge's
+// hanging florals.
+export function wisteriaClusterSVG() {
+  return `<svg class="hero-floral-svg" viewBox="0 0 100 200" aria-hidden="true">
+    <path d="M50 0 C 48 40, 54 80, 48 120 S 52 170, 50 200" fill="none" stroke="#7a9b6b" stroke-width="2" opacity="0.7" />
+    <g fill="#e9b8c8">
+      ${[30, 55, 80, 105, 130, 150].map((y, i) => `<ellipse cx="${50 + (i % 2 === 0 ? -14 : 14)}" cy="${y}" rx="16" ry="9" transform="rotate(${i % 2 === 0 ? -18 : 18} ${50 + (i % 2 === 0 ? -14 : 14)} ${y})" opacity="${0.55 + (i % 3) * 0.12}" />`).join("")}
+    </g>
+    <g fill="#f7e3ea">
+      ${[40, 65, 90, 115, 140].map((y, i) => `<circle cx="${50 + (i % 2 === 0 ? 6 : -6)}" cy="${y}" r="6" opacity="0.8" />`).join("")}
+    </g>
+  </svg>`;
+}
+
+// Bold magenta calla-lily cluster, for the hero badge's other hanging
+// floral corner.
+export function callaLilyClusterSVG() {
+  const lily = (x, y, rot, scale) => `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${scale})">
+    <path d="M0 0 C -14 4, -16 22, -2 34 C 4 24, 4 10, 0 0 Z" fill="#a8215f" />
+    <path d="M0 2 C -6 8, -6 18, 0 26" fill="none" stroke="#7a1746" stroke-width="1.4" opacity="0.6" />
+    <line x1="0" y1="0" x2="4" y2="30" stroke="#5c7a4a" stroke-width="2" />
+  </g>`;
+  return `<svg class="hero-floral-svg" viewBox="0 0 100 140" aria-hidden="true">
+    ${lily(45, 10, -12, 1.5)}
+    ${lily(65, 25, 14, 1.2)}
+    ${lily(30, 35, -22, 1.1)}
+    <path d="M50 0c-4 20-2 40 4 60" fill="none" stroke="#5c7a4a" stroke-width="2" opacity="0.6" />
+  </svg>`;
+}
+
+// Simplified grand-hall illustration placeholder for the hero — arched
+// doorway + balcony with a garland, a chandelier, rows of aisle chairs
+// with topiary trees receding toward the back, an aisle runner, and a
+// small embracing couple at the center. Cream/gold palette, hand-drawn
+// flat shapes (loops generate the repeated chairs/topiary/garland dots
+// rather than hand-placing each one). This is a placeholder standing in
+// for a real commissioned illustration — see NOTES.md asset list.
+export function hallIllustrationSVG() {
+  function chair(x, y, scale) {
+    return `<g transform="translate(${x} ${y}) scale(${scale})" fill="none" stroke="#8a7550" stroke-width="1.6">
+      <path d="M-7 0 L-7 -14 Q0 -18 7 -14 L7 0" />
+      <path d="M-7 0 L-7 10 M7 0 L7 10 M-5 0 L-5 10 M5 0 L5 10" />
+      <ellipse cx="0" cy="-15" rx="6" ry="2.4" fill="#fff" stroke="none" opacity="0.85" />
+    </g>`;
+  }
+  function topiary(x, y, scale) {
+    return `<g transform="translate(${x} ${y}) scale(${scale})">
+      <rect x="-4" y="0" width="8" height="10" fill="#8a6a3f" />
+      <path d="M0 -34 C-13 -20, -13 -4, 0 2 C13 -4, 13 -20, 0 -34 Z" fill="#5c7a4a" opacity="0.85" />
+    </g>`;
+  }
+  const leftChairs = [0, 1, 2].map((i) => chair(70 - i * 16, 240 - i * 34, 1 - i * 0.22)).join("");
+  const rightChairs = [0, 1, 2].map((i) => chair(330 + i * 16, 240 - i * 34, 1 - i * 0.22)).join("");
+  const leftTopiary = [0, 1].map((i) => topiary(48 - i * 10, 214 - i * 46, 1 - i * 0.3)).join("");
+  const rightTopiary = [0, 1].map((i) => topiary(352 + i * 10, 214 - i * 46, 1 - i * 0.3)).join("");
+  const balusters = Array.from({ length: 24 }, (_, i) => {
+    const x = 40 + i * 14;
+    return `<line x1="${x}" y1="92" x2="${x}" y2="104" stroke="#c9b78e" stroke-width="2" />`;
+  }).join("");
+  const garlandDots = Array.from({ length: 18 }, (_, i) => {
+    const x = 130 + i * 8;
+    const y = 78 + Math.sin(i * 0.9) * 3;
+    return `<circle cx="${x}" cy="${y}" r="2.6" fill="#fff" opacity="0.9" />`;
+  }).join("");
+  const chandelierArms = Array.from({ length: 6 }, (_, i) => {
+    const angle = (i / 6) * Math.PI * 2;
+    const x2 = 200 + Math.cos(angle) * 16;
+    const y2 = 42 + Math.sin(angle) * 6 + 6;
+    return `<line x1="200" y1="42" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#c9a96e" stroke-width="1.2" /><circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="2" fill="#e8c98a" />`;
+  }).join("");
+
+  return `<svg class="hero-hall-svg" viewBox="0 0 400 260" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="hall-bg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#f6e9cf" />
+        <stop offset="100%" stop-color="#fbf3e4" />
+      </linearGradient>
+    </defs>
+    <rect width="400" height="260" fill="url(#hall-bg)" />
+
+    <!-- back wall + arched doorway -->
+    <rect x="0" y="20" width="400" height="90" fill="#efdcb8" opacity="0.6" />
+    <path d="M160 190 L160 90 A40 40 0 0 1 240 90 L240 190 Z" fill="#e3c98f" opacity="0.8" />
+    <path d="M160 190 L160 90 A40 40 0 0 1 240 90 L240 190" fill="none" stroke="#8a6a3f" stroke-width="1.4" opacity="0.6" />
+
+    <!-- balcony railing + garland -->
+    <line x1="30" y1="104" x2="370" y2="104" stroke="#8a6a3f" stroke-width="2" />
+    <line x1="30" y1="92" x2="370" y2="92" stroke="#8a6a3f" stroke-width="1.4" opacity="0.7" />
+    ${balusters}
+    ${garlandDots}
+
+    <!-- chandelier -->
+    <line x1="200" y1="0" x2="200" y2="42" stroke="#c9a96e" stroke-width="1.4" />
+    <ellipse cx="200" cy="44" rx="10" ry="4" fill="#e8c98a" />
+    ${chandelierArms}
+
+    <!-- aisle runner -->
+    <path d="M170 260 L230 260 L212 190 L188 190 Z" fill="#f3e6c8" opacity="0.8" />
+
+    ${leftTopiary}${rightTopiary}
+    ${leftChairs}${rightChairs}
+
+    <!-- couple, small and centered near the arch -->
+    <g transform="translate(200 172)">
+      <path d="M-10 40 Q-11 16 0 12 Q11 16 10 40 Z" fill="#6B1E2E" />
+      <circle cx="-4" cy="4" r="5.2" fill="#e3ac7c" />
+      <path d="M-10 42 Q-9 10 -1 4 Q4 12 4 42 Z" fill="#fdfaf5" transform="translate(9 0)" />
+      <circle cx="6" cy="4" r="5.2" fill="#e3ac7c" />
+    </g>
+  </svg>`;
+}
+
 // Two crossing corner-to-corner diagonals — the classic envelope-flap X
 // seam. Drawn as an SVG with preserveAspectRatio="none" so the lines stay
 // pinned exactly to the four corners at any box aspect ratio, and

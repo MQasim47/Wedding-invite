@@ -1,6 +1,7 @@
-import { el } from "../utils/dom.js";
+import { el, fromHTML } from "../utils/dom.js";
 import { config } from "../config.js";
-import { getLang } from "../utils/store.js";
+import { t, getLang } from "../utils/store.js";
+import { laceDoilySVG } from "../utils/icons.js";
 
 function buildLines() {
   const paragraphs = config.welcomeMessage[getLang()] || config.welcomeMessage.en;
@@ -8,13 +9,18 @@ function buildLines() {
 }
 
 export function createWelcomeSection() {
+  const heading = el("h2", { class: "welcome-heading" }, t().welcome.heading);
   const textWrap = el("p", { class: "welcome-text" }, buildLines());
 
   const node = el("section", { class: "section welcome", id: "welcome" }, [
-    el("div", { class: "welcome-frame" }, [textWrap]),
+    el("div", { class: "welcome-frame" }, [
+      fromHTML(laceDoilySVG()),
+      el("div", { class: "welcome-frame-content" }, [heading, textWrap]),
+    ]),
   ]);
 
   function updateLang() {
+    heading.textContent = t().welcome.heading;
     textWrap.replaceChildren(...buildLines());
   }
 

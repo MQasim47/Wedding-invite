@@ -22,7 +22,12 @@ export function animateTimeline(sectionNode) {
       ev.style.opacity = 1;
       ev.style.transform = "none";
     });
-    if (heart) heart.style.opacity = 1;
+    // The heart's whole point is riding the path as you scroll — with no
+    // motion at all it would just sit at its default top-left corner,
+    // which reads as a stray misplaced icon rather than a marker. The
+    // fully-drawn curve + icons already carry the timeline without it.
+    if (heart) heart.style.display = "none";
+    if (path) path.style.strokeDashoffset = "0";
     return;
   }
 

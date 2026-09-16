@@ -18,6 +18,7 @@ const reducedMotion = process.argv.includes("--reduced-motion");
 // the client reviews on an actual Pixel/Galaxy phone, not a resized desktop
 // Chrome window, so this is what --mobile-emulation matches.
 const mobileEmulation = process.argv.includes("--mobile-emulation");
+const frLang = process.argv.includes("--fr");
 const PORT = 5180;
 
 // `shell: true` on Windows spawns npx -> node -> vite as a process tree;
@@ -77,7 +78,12 @@ try {
 
   await page.goto(`http://localhost:${PORT}/`, { waitUntil: "networkidle" });
 
-  const suffix = (mobileEmulation ? "-mobile" : "") + (reducedMotion ? "-reduced-motion" : "");
+  const suffix = (mobileEmulation ? "-mobile" : "") + (reducedMotion ? "-reduced-motion" : "") + (frLang ? "-fr" : "");
+
+  if (frLang) {
+    await page.evaluate(() => localStorage.setItem("wedding-lang", "fr"));
+    await page.reload({ waitUntil: "networkidle" });
+  }
 
   // --- Envelope sequence -------------------------------------------------
   await page.screenshot({ path: `${outDir}/00-envelope-closed${suffix}.png` });

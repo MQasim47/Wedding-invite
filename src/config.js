@@ -132,11 +132,14 @@ export const config = {
   },
 
   theme: {
-    primary: "#6B1E2E", // burgundy
-    accent: "#C9A96E", // gold
-    background: "#FBF7F2", // cream
-    text: "#3A2A2A",
-    envelope: "#8A9A7B", // sage
+    background: "#FFFCFA",
+    surface: "#FDF4F1",
+    text: "#4A3A38",
+    primary: "#C48B93",
+    primaryDeep: "#A96B74",
+    accent: "#C9A227",
+    accentSoft: "#E5CE9A",
+    envelope: "#F4DCDC",
   },
 
   music: {

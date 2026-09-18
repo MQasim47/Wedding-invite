@@ -10,22 +10,26 @@
      baseline automatically instead of needing individual re-tuning. */
   font-size: 106.25%;
 
-  --color-primary: #6B1E2E;
-  --color-accent: #C9A96E;
-  --color-background: #FBF7F2;
-  --color-text: #3A2A2A;
-  --color-envelope: #8A9A7B;
+  --color-background: #FFFCFA;
+  --color-surface: #FDF4F1;
+  --color-text: #4A3A38;
+  --color-primary: #C48B93;
+  --color-primary-deep: #A96B74;
+  --color-accent: #C9A227;
+  --color-accent-soft: #E5CE9A;
+  --color-envelope: #F4DCDC;
 
-  --color-primary-rgb: 107, 30, 46;
-  --color-accent-rgb: 201, 169, 110;
+  --color-primary-rgb: 196, 139, 147;
+  --color-primary-deep-rgb: 169, 107, 116;
+  --color-accent-rgb: 201, 162, 39;
 
   --font-script: "Parisienne", cursive;
   --font-serif: "Cormorant Garamond", "Georgia", serif;
 
-  /* Darkened gold used for small labels/dress codes/captions — the raw
-     --color-accent gold fails WCAG contrast against the cream background at
-     small sizes (~2.1:1), this blend clears 4.5:1. */
-  --color-label: color-mix(in srgb, var(--color-accent) 45%, var(--color-primary) 55%);
+  /* Rosy-dark blend used for small labels/dress codes/captions — clears
+     4.5:1 against the new cream background (~6.2:1 measured) while still
+     reading rosy rather than a flat neutral gray. */
+  --color-label: color-mix(in srgb, var(--color-text) 45%, var(--color-primary-deep) 55%);
 
   --phone-width: 430px;
   --gutter: 24px;

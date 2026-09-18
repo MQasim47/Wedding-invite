@@ -165,9 +165,9 @@ export function sealScallopSVG() {
   return `<svg class="envelope-seal-shape" viewBox="0 0 100 100" aria-hidden="true">
     <defs>
       <radialGradient id="seal-blush" cx="35%" cy="28%" r="80%">
-        <stop offset="0%" stop-color="#ffe8d6" />
-        <stop offset="55%" stop-color="#f0b48d" />
-        <stop offset="100%" stop-color="#cf8a5f" />
+        <stop offset="0%" stop-color="var(--color-accent-soft)" />
+        <stop offset="55%" stop-color="var(--color-accent)" />
+        <stop offset="100%" stop-color="var(--color-primary-deep)" />
       </radialGradient>
     </defs>
     <path d="${d}" fill="url(#seal-blush)" />
@@ -251,9 +251,9 @@ export function laceDoilySVG() {
 // Small flying hummingbird — side profile, wings spread, iridescent body.
 export function hummingbirdSVG() {
   return `<svg class="hummingbird-svg" viewBox="0 0 60 40" aria-hidden="true">
-    <path d="M4 20c6-3 12-2 16 2 2-8 8-14 16-14-4 5-6 10-5 15 4-1 8 0 11 3-5 2-10 2-14 0-3 3-8 4-12 2 3 3 3 6 0 8-2-3-6-4-9-3 2-3 1-7-3-8-4-1-8-3-10-5z" fill="#2f7a5c" />
-    <circle cx="34" cy="17" r="1.6" fill="#1a2e26" />
-    <path d="M34 15c4-2 8-2 11 0-3 1-7 1-11 0z" fill="#c9a96e" opacity="0.7" />
+    <path d="M4 20c6-3 12-2 16 2 2-8 8-14 16-14-4 5-6 10-5 15 4-1 8 0 11 3-5 2-10 2-14 0-3 3-8 4-12 2 3 3 3 6 0 8-2-3-6-4-9-3 2-3 1-7-3-8-4-1-8-3-10-5z" fill="var(--color-accent)" />
+    <circle cx="34" cy="17" r="1.6" fill="#2a1f1c" />
+    <path d="M34 15c4-2 8-2 11 0-3 1-7 1-11 0z" fill="var(--color-accent)" opacity="0.7" />
   </svg>`;
 }
 
@@ -261,7 +261,7 @@ export function hummingbirdSVG() {
 // hanging florals.
 export function wisteriaClusterSVG() {
   return `<svg class="hero-floral-svg" viewBox="0 0 100 200" aria-hidden="true">
-    <path d="M50 0 C 48 40, 54 80, 48 120 S 52 170, 50 200" fill="none" stroke="#7a9b6b" stroke-width="2" opacity="0.7" />
+    <path d="M50 0 C 48 40, 54 80, 48 120 S 52 170, 50 200" fill="none" stroke="var(--color-accent-soft)" stroke-width="2" opacity="0.7" />
     <g fill="#e9b8c8">
       ${[30, 55, 80, 105, 130, 150].map((y, i) => `<ellipse cx="${50 + (i % 2 === 0 ? -14 : 14)}" cy="${y}" rx="16" ry="9" transform="rotate(${i % 2 === 0 ? -18 : 18} ${50 + (i % 2 === 0 ? -14 : 14)} ${y})" opacity="${0.55 + (i % 3) * 0.12}" />`).join("")}
     </g>
@@ -277,13 +277,13 @@ export function callaLilyClusterSVG() {
   const lily = (x, y, rot, scale) => `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${scale})">
     <path d="M0 0 C -14 4, -16 22, -2 34 C 4 24, 4 10, 0 0 Z" fill="#a8215f" />
     <path d="M0 2 C -6 8, -6 18, 0 26" fill="none" stroke="#7a1746" stroke-width="1.4" opacity="0.6" />
-    <line x1="0" y1="0" x2="4" y2="30" stroke="#5c7a4a" stroke-width="2" />
+    <line x1="0" y1="0" x2="4" y2="30" stroke="var(--color-accent-soft)" stroke-width="2" />
   </g>`;
   return `<svg class="hero-floral-svg" viewBox="0 0 100 140" aria-hidden="true">
     ${lily(45, 10, -12, 1.5)}
     ${lily(65, 25, 14, 1.2)}
     ${lily(30, 35, -22, 1.1)}
-    <path d="M50 0c-4 20-2 40 4 60" fill="none" stroke="#5c7a4a" stroke-width="2" opacity="0.6" />
+    <path d="M50 0c-4 20-2 40 4 60" fill="none" stroke="var(--color-accent-soft)" stroke-width="2" opacity="0.6" />
   </svg>`;
 }
 
@@ -305,7 +305,7 @@ export function hallIllustrationSVG() {
   function topiary(x, y, scale) {
     return `<g transform="translate(${x} ${y}) scale(${scale})">
       <rect x="-4" y="0" width="8" height="10" fill="#8a6a3f" />
-      <path d="M0 -34 C-13 -20, -13 -4, 0 2 C13 -4, 13 -20, 0 -34 Z" fill="#5c7a4a" opacity="0.85" />
+      <path d="M0 -34 C-13 -20, -13 -4, 0 2 C13 -4, 13 -20, 0 -34 Z" fill="var(--color-accent-soft)" opacity="0.85" />
     </g>`;
   }
   const leftChairs = [0, 1, 2].map((i) => chair(70 - i * 16, 240 - i * 34, 1 - i * 0.22)).join("");
@@ -314,7 +314,7 @@ export function hallIllustrationSVG() {
   const rightTopiary = [0, 1].map((i) => topiary(352 + i * 10, 214 - i * 46, 1 - i * 0.3)).join("");
   const balusters = Array.from({ length: 24 }, (_, i) => {
     const x = 40 + i * 14;
-    return `<line x1="${x}" y1="92" x2="${x}" y2="104" stroke="#c9b78e" stroke-width="2" />`;
+    return `<line x1="${x}" y1="92" x2="${x}" y2="104" stroke="var(--color-accent-soft)" stroke-width="2" />`;
   }).join("");
   const garlandDots = Array.from({ length: 18 }, (_, i) => {
     const x = 130 + i * 8;
@@ -325,7 +325,7 @@ export function hallIllustrationSVG() {
     const angle = (i / 6) * Math.PI * 2;
     const x2 = 200 + Math.cos(angle) * 16;
     const y2 = 42 + Math.sin(angle) * 6 + 6;
-    return `<line x1="200" y1="42" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#c9a96e" stroke-width="1.2" /><circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="2" fill="#e8c98a" />`;
+    return `<line x1="200" y1="42" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="var(--color-accent)" stroke-width="1.2" /><circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="2" fill="var(--color-accent-soft)" />`;
   }).join("");
 
   return `<svg class="hero-hall-svg" viewBox="0 0 400 260" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
@@ -349,8 +349,8 @@ export function hallIllustrationSVG() {
     ${garlandDots}
 
     <!-- chandelier -->
-    <line x1="200" y1="0" x2="200" y2="42" stroke="#c9a96e" stroke-width="1.4" />
-    <ellipse cx="200" cy="44" rx="10" ry="4" fill="#e8c98a" />
+    <line x1="200" y1="0" x2="200" y2="42" stroke="var(--color-accent)" stroke-width="1.4" />
+    <ellipse cx="200" cy="44" rx="10" ry="4" fill="var(--color-accent-soft)" />
     ${chandelierArms}
 
     <!-- aisle runner -->
@@ -361,7 +361,7 @@ export function hallIllustrationSVG() {
 
     <!-- couple, small and centered near the arch -->
     <g transform="translate(200 172)">
-      <path d="M-10 40 Q-11 16 0 12 Q11 16 10 40 Z" fill="#6B1E2E" />
+      <path d="M-10 40 Q-11 16 0 12 Q11 16 10 40 Z" fill="var(--color-primary)" />
       <circle cx="-4" cy="4" r="5.2" fill="#e3ac7c" />
       <path d="M-10 42 Q-9 10 -1 4 Q4 12 4 42 Z" fill="#fdfaf5" transform="translate(9 0)" />
       <circle cx="6" cy="4" r="5.2" fill="#e3ac7c" />
@@ -388,7 +388,7 @@ export function dahliaBandSVG() {
     return out;
   }
 
-  const tones = ["#5c1420", "#7a1c2b", "#4a0f1a", "#6e1826"];
+  const tones = ["var(--color-accent)", "var(--color-accent-soft)", "var(--color-primary)", "var(--color-primary-deep)"];
   let blooms = "";
   const positions = [
     [40, 55, 34], [110, 35, 30], [175, 60, 36], [235, 30, 28], [300, 55, 34],
@@ -401,11 +401,11 @@ export function dahliaBandSVG() {
   const flecks = Array.from({ length: 14 }, () => {
     const x = (Math.random() * 400).toFixed(1);
     const y = (Math.random() * 90).toFixed(1);
-    return `<circle cx="${x}" cy="${y}" r="1.4" fill="#e8c98a" opacity="${(0.4 + Math.random() * 0.4).toFixed(2)}" />`;
+    return `<circle cx="${x}" cy="${y}" r="1.4" fill="var(--color-accent-soft)" opacity="${(0.4 + Math.random() * 0.4).toFixed(2)}" />`;
   }).join("");
 
   return `<svg class="dahlia-band-svg" viewBox="0 0 400 90" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <rect width="400" height="90" fill="#3a0d16" />
+    <rect width="400" height="90" fill="color-mix(in srgb, var(--color-primary-deep) 55%, black 45%)" />
     ${blooms}
     ${flecks}
   </svg>`;
@@ -419,9 +419,9 @@ export function waxSealHeartSVG() {
   return `<svg class="wax-seal-heart-svg" viewBox="0 0 100 100" aria-hidden="true">
     <defs>
       <radialGradient id="wax-heart-grad" cx="34%" cy="28%" r="75%">
-        <stop offset="0%" stop-color="#c14a5e" />
-        <stop offset="45%" stop-color="#8a2438" />
-        <stop offset="100%" stop-color="#5c1424" />
+        <stop offset="0%" stop-color="var(--color-accent-soft)" />
+        <stop offset="45%" stop-color="var(--color-primary)" />
+        <stop offset="100%" stop-color="var(--color-primary-deep)" />
       </radialGradient>
     </defs>
     <path d="M50 88s-30-18.7-39.6-37.5C4.3 39.6 8.3 24 21 24c8.3 0 14.6 5 17.9 10.6C42.2 29 48.5 24 56.8 24c12.7 0 16.7 15.6 10.6 26.5C58.2 69.3 50 88 50 88z" fill="url(#wax-heart-grad)" />

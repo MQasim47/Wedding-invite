@@ -159,7 +159,7 @@ svg { display: block; }
   width: 56px;
   height: 58%;
   transform: translateY(-50%);
-  color: #000;
+  color: var(--color-accent);
   z-index: 1;
   filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.3)) drop-shadow(0 -1px 0.5px rgba(0, 0, 0, 0.25));
 }
@@ -238,7 +238,7 @@ svg { display: block; }
 
 .envelope-seal-initials {
   position: relative;
-  color: #7a3f1d;
+  color: var(--color-primary-deep);
   font-family: var(--font-script);
   font-size: 1.7rem;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
@@ -929,7 +929,7 @@ svg { display: block; }
   gap: 8px;
   padding: 12px 24px;
   border-radius: 999px;
-  background: var(--color-primary);
+  background: var(--color-primary-deep);
   color: #fff;
   font-size: 0.9rem;
   letter-spacing: 0.04em;
@@ -941,8 +941,8 @@ svg { display: block; }
 
 .btn-outline {
   background: transparent;
-  color: var(--color-primary);
-  border: 1.5px solid var(--color-primary);
+  color: var(--color-primary-deep);
+  border: 1.5px solid var(--color-primary-deep);
 }
 
 .venue-map-btn { margin-top: 16px; }
@@ -1096,7 +1096,7 @@ svg { display: block; }
 .field-textarea { resize: vertical; min-height: 90px; }
 
 .field-error {
-  color: #a02334;
+  color: var(--color-primary-deep);
   font-size: 0.78rem;
   margin-top: 4px;
   min-height: 1em;
@@ -1195,7 +1195,7 @@ svg { display: block; }
   font-size: 0.85rem;
 }
 
-.rsvp-status[data-kind="error"] { color: #a02334; }
+.rsvp-status[data-kind="error"] { color: var(--color-primary-deep); }
 .rsvp-status[data-kind="demo"] { color: var(--color-label); }
 
 .rsvp-success {

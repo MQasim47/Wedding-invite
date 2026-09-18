@@ -13,12 +13,16 @@ function hexToRgb(hex) {
 // the site flow from config.js alone.
 export function applyTheme() {
   const root = document.documentElement;
-  const { primary, accent, background, text, envelope } = config.theme;
+  const { primary, primaryDeep, accent, accentSoft, background, surface, text, envelope } = config.theme;
   root.style.setProperty("--color-primary", primary);
+  root.style.setProperty("--color-primary-deep", primaryDeep);
   root.style.setProperty("--color-accent", accent);
+  root.style.setProperty("--color-accent-soft", accentSoft);
   root.style.setProperty("--color-background", background);
+  root.style.setProperty("--color-surface", surface);
   root.style.setProperty("--color-text", text);
   root.style.setProperty("--color-envelope", envelope);
   root.style.setProperty("--color-primary-rgb", hexToRgb(primary));
+  root.style.setProperty("--color-primary-deep-rgb", hexToRgb(primaryDeep));
   root.style.setProperty("--color-accent-rgb", hexToRgb(accent));
 }

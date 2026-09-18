@@ -12,7 +12,11 @@ export const icons = {
   check: `<svg class="rsvp-success-check" viewBox="0 0 52 52"><circle cx="26" cy="26" r="23"/><path d="M15 27l7 7 15-15"/></svg>`,
   divider: `<svg viewBox="0 0 80 24" fill="none" stroke="currentColor" stroke-width="1"><line x1="0" y1="12" x2="28" y2="12"/><circle cx="40" cy="12" r="4" fill="currentColor" stroke="none"/><line x1="52" y1="12" x2="80" y2="12"/></svg>`,
   heartOutlineDraw: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path class="heart-draw-path" d="M12 20s-7-4.5-9.5-9C.8 7.5 2.5 4 6 4c2 0 3.5 1.2 4 2.5C10.5 5.2 12 4 14 4c3.5 0 5.2 3.5 3.5 7-2.5 4.5-9.5 9-9.5 9z"/></svg>`,
-  heartSolid: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20s-7-4.5-9.5-9C.8 7.5 2.5 4 6 4c2 0 3.5 1.2 4 2.5C10.5 5.2 12 4 14 4c3.5 0 5.2 3.5 3.5 7-2.5 4.5-9.5 9-9.5 9z"/></svg>`,
+  // Symmetric heart (even left/right lobes, centered in its own viewBox) —
+  // unlike the hand-drawn `heart`/`heartOutlineDraw` outline above, this one
+  // needs to be optically centered since the calendar wraps a day number
+  // inside it via plain flexbox centering on the container.
+  heartSolid: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`,
 };
 
 // Builds two V-shaped chains of interlocking oval links running from wide

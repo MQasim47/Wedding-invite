@@ -38,11 +38,17 @@ export function downloadICS() {
     lang
   )}`;
 
-  const addressLines = config.venues.map(
-    (venue) => `${resolveText(venue.heading, lang)}: ${venue.address}`
-  );
   const location = config.venues.map((venue) => venue.address).join(" / ");
-  const description = [summary, ...addressLines].join("\n");
+
+  // DESCRIPTION is always bilingual regardless of the guest's current UI
+  // language (SUMMARY above stays single-language) — a guest who toggles to
+  // FR just to browse the site but adds the event in EN (or vice versa)
+  // should still get both languages in their calendar app.
+  const bilingualSummary = `${config.couple.partner1} & ${config.couple.partner2} — Wedding / Mariage`;
+  const bilingualAddressLines = config.venues.map(
+    (venue) => `${resolveText(venue.heading, "en")} / ${resolveText(venue.heading, "fr")}: ${venue.address}`
+  );
+  const description = [bilingualSummary, ...bilingualAddressLines].join("\n");
 
   const lines = [
     "BEGIN:VCALENDAR",

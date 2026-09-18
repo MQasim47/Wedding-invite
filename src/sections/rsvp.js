@@ -24,7 +24,7 @@ function isDeadlinePassed() {
 export function createRsvpSection() {
   if (!config.rsvp.enabled) return null;
 
-  const sectionTitle = el("h2", { class: "section-title-serif" }, t().rsvp.title);
+  const sectionTitle = el("h2", { class: "section-title-serif" }, t().rsvp.heading);
 
   if (isDeadlinePassed()) {
     const closedTitle = el("p", { class: "rsvp-success-title" }, t().rsvp.closedTitle);
@@ -35,7 +35,7 @@ export function createRsvpSection() {
     ]);
 
     function updateLang() {
-      sectionTitle.textContent = t().rsvp.title;
+      sectionTitle.textContent = t().rsvp.heading;
       closedTitle.textContent = t().rsvp.closedTitle;
       closedMsg.textContent = t().rsvp.closedMessage;
     }
@@ -115,7 +115,9 @@ export function createRsvpSection() {
   const successMsg = el("p", {}, t().rsvp.successMessage);
   const successWrap = el("div", { class: "rsvp-success", hidden: true }, [successCheck, successTitle, successMsg]);
 
-  const watermark = el("div", { class: "rsvp-watermark", "aria-hidden": "true" }, t().rsvp.title);
+  // Decorative background typography only — stays the literal word "RSVP"
+  // regardless of language (see NOTES.md Batch 4), not sourced from t().
+  const watermark = el("div", { class: "rsvp-watermark", "aria-hidden": "true" }, "RSVP");
 
   const node = el("section", { class: "section rsvp-section", id: "rsvp" }, [
     watermark,
@@ -228,8 +230,7 @@ export function createRsvpSection() {
   form.addEventListener("submit", handleSubmit);
 
   function updateLang() {
-    sectionTitle.textContent = t().rsvp.title;
-    watermark.textContent = t().rsvp.title;
+    sectionTitle.textContent = t().rsvp.heading;
     deadlineEl.textContent = `${t().rsvp.deadlinePrefix} ${formatDeadline(getLang())}.`;
     nameLabel.textContent = t().rsvp.name;
     nameInput.placeholder = t().rsvp.namePlaceholder;

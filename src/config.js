@@ -43,7 +43,7 @@ export const config = {
   // the exact wording/punctuation is guaranteed on both languages.
   weddingDateDisplay: {
     en: "Saturday · December 5, 2026",
-    fr: "Samedi · 5 décembre 2026",
+    fr: "samedi 5 décembre 2026",
   },
 
   welcomeMessage: {
@@ -52,7 +52,7 @@ export const config = {
       "Your presence will make our special day even more meaningful and unforgettable.",
     ],
     fr: [
-      "Le cœur rempli d'amour et de joie, nous vous invitons à célébrer avec nous le début de l'un des plus beaux chapitres de notre vie à deux.",
+      "Le cœur rempli d'amour et de joie, nous vous invitons à célébrer avec nous le début de l'un des plus beaux chapitres de notre vie.",
       "Votre présence rendra cette journée encore plus précieuse et inoubliable.",
     ],
   },
@@ -67,10 +67,10 @@ export const config = {
       title: { en: "Wedding Ceremony", fr: "Cérémonie de mariage" },
       icon: "rings",
       venueIndex: 0,
-      dressCode: { en: "Elegant Daytime Attire", fr: "Tenue de journée élégante" },
+      dressCode: { en: "Elegant Daytime Attire", fr: "Tenue de jour élégante" },
       note: {
         en: "Ladies: English-style hats encouraged",
-        fr: "Mesdames : les chapeaux de style anglais sont les bienvenus",
+        fr: "Mesdames : chapeaux à l'anglaise bienvenus",
       },
     },
     {
@@ -84,7 +84,7 @@ export const config = {
       title: { en: "Wedding Reception", fr: "Réception" },
       icon: "dinner",
       venueIndex: 1,
-      dressCode: { en: "Formal Evening Attire", fr: "Tenue de soirée formelle" },
+      dressCode: { en: "Formal Evening Attire", fr: "Tenue de soirée" },
     },
   ],
 
@@ -113,7 +113,7 @@ export const config = {
   weddingParty: {
     enabled: true,
     bridesmaids: [
-      { name: "Add Name", role: { en: "Maid of Honor", fr: "Demoiselle d'honneur principale" }, photo: "" },
+      { name: "Add Name", role: { en: "Maid of Honor", fr: "Témoin de la mariée" }, photo: "" },
       { name: "Add Name", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "" },
       { name: "Add Name", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "" },
       { name: "Add Name", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "" },
@@ -128,7 +128,7 @@ export const config = {
 
   closingMessage: {
     en: "Two hearts, two lives, one promise forever.",
-    fr: "Deux cœurs, deux vies, une promesse pour toujours.",
+    fr: "Deux cœurs, deux vies, une seule promesse pour toujours.",
   },
 
   theme: {

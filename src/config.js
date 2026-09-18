@@ -133,13 +133,13 @@ export const config = {
 
   theme: {
     background: "#FFFCFA",
-    surface: "#FDF4F1",
-    text: "#4A3A38",
-    primary: "#C48B93",
-    primaryDeep: "#A96B74",
+    surface: "#FBEDEF",
+    text: "#3E2A2E",
+    primary: "#A83A56", // deep rose/raspberry
+    primaryDeep: "#82263F",
     accent: "#C9A227",
     accentSoft: "#E5CE9A",
-    envelope: "#F4DCDC",
+    envelope: "#E7A4B4",
   },
 
   music: {

@@ -399,7 +399,9 @@ svg { display: block; }
   top: 26%;
   width: 14px;
   height: 14px;
-  color: var(--color-accent);
+  /* Pink, matching every other heart on the site (calendar, timeline,
+     closing wax seal) — gold is reserved for borders/chains/ornaments. */
+  color: var(--color-primary);
   transform: translate(-50%, -50%);
 }
 

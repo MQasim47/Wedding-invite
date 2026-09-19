@@ -194,12 +194,17 @@ export const config = {
         },
         {
           src: "/images/couple/optimized/couple-5.webp",
-          alt: { en: "Dalida and Aimé beneath a floral arch", fr: "Dalida et Aimé sous une arche florale" },
-          position: "center 15%",
+          alt: { en: "Dalida and Aimé sharing a kiss in matching white outfits", fr: "Dalida et Aimé échangeant un baiser en tenues blanches assorties" },
+          position: "center",
         },
         {
           src: "/images/couple/optimized/couple-6.webp",
           alt: { en: "Dalida and Aimé in matching white tees and caps", fr: "Dalida et Aimé en t-shirts blancs et casquettes assortis" },
+          position: "center 15%",
+        },
+        {
+          src: "/images/couple/optimized/couple-7.webp",
+          alt: { en: "Dalida and Aimé in navy formal attire before a floral backdrop", fr: "Dalida et Aimé en tenue de soirée bleu marine devant un décor floral" },
           position: "center 15%",
         },
       ],

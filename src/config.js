@@ -224,6 +224,6 @@ export const config = {
     title: "Dalida & Aimé — Wedding Invitation · Invitation de mariage",
     description: "You're invited to our wedding on December 5, 2026",
     ogImage: "/images/og-image.jpg", // 1200x630 — regenerate with `npm run generate:og` if names/date change, see README
-    siteUrl: "https://example.vercel.app",
+    siteUrl: "https://www.dalidaetaime.com",
   },
 };

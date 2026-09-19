@@ -312,7 +312,7 @@ svg { display: block; }
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(6px);
-  color: var(--color-primary);
+  color: var(--color-primary-deep);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -565,7 +565,9 @@ svg { display: block; }
   padding: 0 var(--gutter);
   font-family: var(--font-script);
   font-size: 1.3rem;
-  color: var(--color-primary);
+  /* Below the WCAG large-text size threshold at this weight, so it needs
+     the deeper pink to clear 4.5:1 rather than the brighter --color-primary. */
+  color: var(--color-primary-deep);
   position: relative;
   z-index: 1;
 }
@@ -799,8 +801,8 @@ svg { display: block; }
 .calendar-day-heart-icon {
   position: absolute;
   inset: 0;
-  /* Deeper rose (not the lighter --color-primary) so the cream number on
-     top clears readable contrast — measured ~4.2:1 vs ~2.8:1. */
+  /* Deeper rose (not the brighter --color-primary) so the cream number on
+     top clears readable contrast — measured ~6.5:1 vs ~3.3:1. */
   color: var(--color-primary-deep);
 }
 .calendar-day-heart-icon svg { width: 100%; height: 100%; }
@@ -1010,7 +1012,9 @@ svg { display: block; }
   height: 78px;
   border-radius: 50%;
   border: 1.5px solid var(--color-primary);
-  color: var(--color-primary);
+  /* Deep, not bright — the small uppercase .countdown-label inherits this
+     and needs 4.5:1; the ring border above stays the brighter --color-primary. */
+  color: var(--color-primary-deep);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1110,7 +1114,7 @@ svg { display: block; }
   font-size: 0.88rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--color-primary);
+  color: var(--color-primary-deep);
   margin-bottom: 6px;
   font-weight: 600;
 }
@@ -1188,7 +1192,7 @@ svg { display: block; }
 .stepper-btn {
   width: 22px;
   height: 22px;
-  color: var(--color-primary);
+  color: var(--color-primary-deep);
   font-size: 1.2rem;
   display: flex;
   align-items: center;
@@ -1205,7 +1209,7 @@ svg { display: block; }
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-primary);
+  color: var(--color-primary-deep);
 }
 
 .guests-field { display: flex; flex-direction: column; align-items: center; }
@@ -1367,7 +1371,9 @@ svg { display: block; }
 .closing-waiting {
   font-family: var(--font-script);
   font-size: clamp(1.2rem, 5.5vw, 1.5rem);
-  color: var(--color-primary);
+  /* Below the WCAG large-text threshold on mobile, so it needs the deeper
+     pink to clear 4.5:1 rather than the brighter --color-primary. */
+  color: var(--color-primary-deep);
   max-width: 160px;
   text-align: left;
 }

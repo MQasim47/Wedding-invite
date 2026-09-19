@@ -11,16 +11,16 @@
   font-size: 106.25%;
 
   --color-background: #FFFCFA;
-  --color-surface: #FBEDEF;
+  --color-surface: #FCEFF3;
   --color-text: #3E2A2E;
-  --color-primary: #A83A56;
-  --color-primary-deep: #82263F;
+  --color-primary: #D06C90;
+  --color-primary-deep: #9E3A60;
   --color-accent: #C9A227;
   --color-accent-soft: #E5CE9A;
-  --color-envelope: #E7A4B4;
+  --color-envelope: #F2A8C0;
 
-  --color-primary-rgb: 168, 58, 86;
-  --color-primary-deep-rgb: 130, 38, 63;
+  --color-primary-rgb: 208, 108, 144;
+  --color-primary-deep-rgb: 158, 58, 96;
   --color-accent-rgb: 201, 162, 39;
 
   --font-script: "Parisienne", cursive;

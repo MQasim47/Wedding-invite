@@ -231,8 +231,11 @@ function scallopPath(cx, cy, rx, ry, bumps, ampRatio, archBoost = 0) {
 // identically since the hero section sits on a flat, untextured cream
 // background right where the badge lives).
 export function badgeCartoucheSVG() {
+  // primaryDeep, not primary: the badge carries cream text directly on top
+  // (names, and the small DAY/MONTH date labels) — same reasoning as the
+  // calendar heart icon below.
   return `<svg class="hero-badge-svg" viewBox="0 0 100 66" preserveAspectRatio="none" aria-hidden="true">
-    <rect x="1.5" y="1.5" width="97" height="63" rx="13" ry="18" fill="var(--color-primary)" />
+    <rect x="1.5" y="1.5" width="97" height="63" rx="13" ry="18" fill="var(--color-primary-deep)" />
     <circle cx="1.5" cy="1.5" r="8" fill="var(--color-background)" />
     <circle cx="98.5" cy="1.5" r="8" fill="var(--color-background)" />
     <circle cx="1.5" cy="64.5" r="8" fill="var(--color-background)" />
@@ -279,8 +282,8 @@ export function wisteriaClusterSVG() {
 // floral corner.
 export function callaLilyClusterSVG() {
   const lily = (x, y, rot, scale) => `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${scale})">
-    <path d="M0 0 C -14 4, -16 22, -2 34 C 4 24, 4 10, 0 0 Z" fill="#a8215f" />
-    <path d="M0 2 C -6 8, -6 18, 0 26" fill="none" stroke="#7a1746" stroke-width="1.4" opacity="0.6" />
+    <path d="M0 0 C -14 4, -16 22, -2 34 C 4 24, 4 10, 0 0 Z" fill="var(--color-primary-deep)" />
+    <path d="M0 2 C -6 8, -6 18, 0 26" fill="none" stroke="var(--color-primary)" stroke-width="1.4" opacity="0.6" />
     <line x1="0" y1="0" x2="4" y2="30" stroke="var(--color-accent-soft)" stroke-width="2" />
   </g>`;
   return `<svg class="hero-floral-svg" viewBox="0 0 100 140" aria-hidden="true">
@@ -373,7 +376,7 @@ export function hallIllustrationSVG() {
   </svg>`;
 }
 
-// Dense wine/burgundy dahlia-bloom band — a placeholder for a real
+// Dense pink/gold dahlia-bloom band — a placeholder for a real
 // photographic floral strip (see NOTES.md asset list), acting as a rich
 // section divider before RSVP. Each "bloom" is a ring of overlapping
 // petal ellipses around a dark center, tiled with jitter so the repeat
@@ -409,14 +412,14 @@ export function dahliaBandSVG() {
   }).join("");
 
   return `<svg class="dahlia-band-svg" viewBox="0 0 400 90" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <rect width="400" height="90" fill="color-mix(in srgb, var(--color-primary-deep) 55%, black 45%)" />
+    <rect width="400" height="90" fill="var(--color-primary-deep)" />
     ${blooms}
     ${flecks}
   </svg>`;
 }
 
-// Glossy 3D-look burgundy wax-seal heart for the closing section — a
-// radial-gradient fill (light highlight upper-left, dark burgundy edges)
+// Glossy 3D-look pink wax-seal heart for the closing section — a
+// radial-gradient fill (light highlight upper-left, deep pink edges)
 // plus a small white gloss ellipse overlay, standing in for the reference's
 // raised/highlighted wax-seal heart rather than a flat outline icon.
 export function waxSealHeartSVG() {

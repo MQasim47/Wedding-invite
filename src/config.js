@@ -133,13 +133,13 @@ export const config = {
 
   theme: {
     background: "#FFFCFA",
-    surface: "#FBEDEF",
+    surface: "#FCEFF3",
     text: "#3E2A2E",
-    primary: "#A83A56", // deep rose/raspberry
-    primaryDeep: "#82263F",
+    primary: "#D06C90", // clear, bright pink — fills, hearts, borders, ornaments, large script headings. Never white/small text — only ~3.3:1 against white.
+    primaryDeep: "#9E3A60", // deeper pink — buttons/badges/fills carrying white or small text, links, pressed states
     accent: "#C9A227",
     accentSoft: "#E5CE9A",
-    envelope: "#E7A4B4",
+    envelope: "#F2A8C0",
   },
 
   music: {

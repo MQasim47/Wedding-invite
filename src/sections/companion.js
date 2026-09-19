@@ -1,7 +1,7 @@
 import { el, fromHTML } from "../utils/dom.js";
 import { config } from "../config.js";
-import { t } from "../utils/store.js";
-import { companionCoupleSVG } from "../utils/icons.js";
+import { t, getLang } from "../utils/store.js";
+import { companionCoupleSVG, companionRingSVG } from "../utils/icons.js";
 
 // Builds the floating companion illustration. Content depends on
 // config.companion.type: "svg" (default) draws the built-in couple
@@ -17,7 +17,9 @@ export function createCompanionSection({ onTap } = {}) {
   if (!config.companion.enabled) return null;
 
   const artEl = el("span", { class: "companion-art" });
-  const inner = el("span", { class: "companion-inner" }, [artEl]);
+  // Gold ring matching the Wedding Party avatars — purely decorative, so it
+  // sits behind/around .companion-art rather than inside it.
+  const inner = el("span", { class: "companion-inner" }, [fromHTML(companionRingSVG()), artEl]);
   const heartsEl = el("span", { class: "companion-hearts", "aria-hidden": "true" });
 
   const node = el(
@@ -32,7 +34,7 @@ export function createCompanionSection({ onTap } = {}) {
     [inner, heartsEl]
   );
 
-  loadArt(artEl);
+  const imgEl = loadArt(artEl);
 
   node.addEventListener("click", () => onTap?.());
 
@@ -42,17 +44,24 @@ export function createCompanionSection({ onTap } = {}) {
 
   function updateLang() {
     node.setAttribute("aria-label", t().companion.label);
+    if (imgEl && config.companion.alt) {
+      imgEl.alt = config.companion.alt[getLang()] || config.companion.alt.en;
+    }
   }
 
   return { node, innerNode: inner, heartsEl, show, updateLang };
 }
 
+// Returns the created <img> element when type is "image" (so alt text can
+// be kept in sync on language change), or undefined otherwise.
 function loadArt(artEl) {
-  const { type, src } = config.companion;
+  const { type, src, alt } = config.companion;
 
   if (type === "image" && src) {
-    artEl.appendChild(el("img", { src, alt: "", loading: "lazy", decoding: "async" }));
-    return;
+    const initialAlt = (alt && (alt[getLang()] || alt.en)) || "";
+    const img = el("img", { src, alt: initialAlt, loading: "lazy", decoding: "async" });
+    artEl.appendChild(img);
+    return img;
   }
 
   if (type === "lottie" && src) {

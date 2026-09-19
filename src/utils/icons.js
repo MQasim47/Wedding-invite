@@ -133,6 +133,13 @@ export function silhouetteAvatarSVG(kind = "bridesmaid") {
   </svg>`;
 }
 
+// Thin gold ring around the floating companion's photo, matching the
+// Wedding Party avatars' ring treatment (see ringSVG() in
+// sections/weddingParty.js) so both read as the same design.
+export function companionRingSVG() {
+  return `<svg class="companion-ring" viewBox="0 0 100 100" aria-hidden="true"><circle class="companion-ring-circle" cx="50" cy="50" r="47" /></svg>`;
+}
+
 export function envelopePattern() {
   return `<svg viewBox="0 0 200 133" xmlns="http://www.w3.org/2000/svg">
     <defs>

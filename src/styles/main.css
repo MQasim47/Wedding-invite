@@ -328,14 +328,10 @@ svg { display: block; }
 /* ---------------------------------------------------------------------- */
 .companion {
   position: fixed;
-  width: 80px;
-  height: 80px;
+  width: 92px;
+  height: 92px;
   z-index: 45;
-  padding: 10px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.4s ease;
@@ -371,18 +367,60 @@ svg { display: block; }
   pointer-events: auto;
 }
 
-.companion-inner,
-.companion-art {
+.companion-inner {
   display: block;
+  position: relative;
   width: 100%;
   height: 100%;
 }
 
-.companion-art svg,
-.companion-art img {
+/* Gold ring, matching .party-ring/.party-ring-circle on the Wedding Party
+   avatars — a thin stroked circle just inside the outer edge, with
+   .companion-art (the actual photo/illustration) inset further still so
+   there's a visible gap between the ring and the art, same as those. */
+.companion-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform: rotate(-90deg);
+}
+
+.companion-ring-circle {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.companion-art {
+  position: absolute;
+  inset: 9px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* The flat SVG illustration keeps its own proportions inside the circle
+   (it isn't drawn to bleed edge-to-edge); a real photo should always fill
+   and crop to the circle instead. */
+.companion-art svg {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  display: block;
+}
+
+.companion-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   display: block;
 }
 

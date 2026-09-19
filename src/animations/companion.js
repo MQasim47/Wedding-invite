@@ -27,9 +27,11 @@ export function initCompanionAnimations({ node, innerNode, heartsEl }) {
 
 function startIdleBob(innerNode) {
   if (!innerNode) return;
+  // Slow and small — a photo reads oddly with the snappier bounce that
+  // suited the flat cartoon illustration.
   gsap.to(innerNode, {
-    y: -8,
-    duration: 1.6,
+    y: -4,
+    duration: 2.6,
     repeat: -1,
     yoyo: true,
     ease: "sine.inOut",

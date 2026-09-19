@@ -212,15 +212,18 @@ export const config = {
     gifts: { enabled: false, text: { en: "", fr: "" } },
   },
 
-  // A small floating couple illustration that follows scroll. "svg" (the
-  // default) draws a built-in flat-style bride & groom in the theme
-  // colors — leave `src` empty. Set "image" + `src` for a PNG/WebP, or
-  // "lottie" + `src` for a Lottie JSON/.lottie file (lottie-web is only
-  // ever loaded when type is "lottie"). See README for details.
+  // A small floating couple avatar that follows scroll. "image" (the
+  // current choice) shows a real cropped photo — `alt` is only used for
+  // this type. "svg" draws a built-in flat-style bride & groom in the
+  // theme colors instead (leave `src` empty) — switching back to it needs
+  // no code change, just type: "svg" here. "lottie" + `src` loads a
+  // Lottie JSON/.lottie file (lottie-web is only ever loaded when type is
+  // "lottie"). See README for details.
   companion: {
     enabled: true,
-    type: "svg", // "svg" | "lottie" | "image"
-    src: "",
+    type: "image", // "svg" | "lottie" | "image"
+    src: "/images/couple/optimized/companion.webp",
+    alt: { en: "Dalida & Aimé", fr: "Dalida et Aimé" },
     position: "bottom-left",
   },
 

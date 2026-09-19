@@ -70,7 +70,7 @@ export const config = {
       dressCode: { en: "Elegant Daytime Attire", fr: "Tenue de jour élégante" },
       note: {
         en: "Ladies: English-style hats encouraged",
-        fr: "Mesdames : chapeaux à l'anglaise bienvenus",
+        fr: "Mesdames : chapeaux à l'anglaise bienvenus",
       },
     },
     {
@@ -108,13 +108,11 @@ export const config = {
   // Dedicated section between "Our Story" and the calendar. Leave `photo`
   // empty for a drawn silhouette placeholder — drop a real optimized photo
   // path in later (see couple.photo above for the pipeline). The first
-  // entry in each list is treated as Maid of Honor / Best Man and rendered
-  // larger.
-  // No Maid of Honor / Best Man has been named yet, so everyone below is a
-  // regular Bridesmaid/Groomsman — the first entry in each list still
-  // renders larger (see weddingParty.js), which is a layout detail, not a
-  // role. Add more entries here as the client sends them; each needs a
-  // square face-centered photo (see public/images/wedding-party/README.md).
+  // entry in each list renders larger (a layout detail, not a role — no
+  // Maid of Honor / Best Man has been named yet, so everyone below is a
+  // plain Bridesmaid/Groomsman). Add more entries as the client sends
+  // them; each needs a square face-centered photo (see
+  // public/images/wedding-party/README.md).
   weddingParty: {
     enabled: true,
     bridesmaids: [
@@ -228,7 +226,7 @@ export const config = {
 
   meta: {
     title: "Dalida & Aimé — Wedding Invitation · Invitation de mariage",
-    description: "You're invited to our wedding on December 5, 2026",
+    description: "You're invited to our wedding on December 5, 2026 · Vous êtes invité(e) à notre mariage le 5 décembre 2026",
     ogImage: "/images/og-image.jpg", // 1200x630 — regenerate with `npm run generate:og` if names/date change, see README
     siteUrl: "https://www.dalidaetaime.com",
   },

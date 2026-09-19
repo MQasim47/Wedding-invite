@@ -100,7 +100,7 @@ export const i18n = {
       dear: "Cher/Chère",
     },
     welcome: {
-      heading: "Chers invités",
+      heading: "Chers invités !",
     },
     story: {
       title: "NOTRE HISTOIRE",
@@ -128,7 +128,7 @@ export const i18n = {
     },
     countdown: {
       title: "COMPTE À REBOURS",
-      heading: "Avant le mariage :",
+      heading: "Avant le mariage :",
       days: "Jours",
       hours: "Heures",
       minutes: "Minutes",
@@ -157,7 +157,7 @@ export const i18n = {
       errorName: "Veuillez saisir votre nom.",
       errorAttending: "Veuillez choisir une option.",
       demoNotice: "Mode démo — aucune donnée n'a été envoyée.",
-      closedTitle: "Les réponses sont désormais closes.",
+      closedTitle: "RSVP clos",
       closedMessage: "Merci de votre intérêt — la date limite de confirmation est dépassée. N'hésitez pas à contacter directement les mariés.",
     },
     extras: {
@@ -166,7 +166,7 @@ export const i18n = {
       giftsTitle: "Cadeaux",
     },
     closing: {
-      withLove: "Avec tout notre amour,",
+      withLove: "Avec amour,",
       waitingForYou: "Nous vous attendons !",
       footer: "FAIT AVEC AMOUR",
     },

@@ -110,19 +110,20 @@ export const config = {
   // path in later (see couple.photo above for the pipeline). The first
   // entry in each list is treated as Maid of Honor / Best Man and rendered
   // larger.
+  // No Maid of Honor / Best Man has been named yet, so everyone below is a
+  // regular Bridesmaid/Groomsman — the first entry in each list still
+  // renders larger (see weddingParty.js), which is a layout detail, not a
+  // role. Add more entries here as the client sends them; each needs a
+  // square face-centered photo (see public/images/wedding-party/README.md).
   weddingParty: {
     enabled: true,
     bridesmaids: [
-      { name: "Add Name", role: { en: "Maid of Honor", fr: "Témoin de la mariée" }, photo: "" },
-      { name: "Add Name", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "" },
-      { name: "Add Name", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "" },
-      { name: "Add Name", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "" },
+      { name: "Irene", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "/images/wedding-party/irene.webp" },
+      { name: "Lovelyne", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "/images/wedding-party/lovelyne.webp" },
     ],
     groomsmen: [
-      { name: "Add Name", role: { en: "Best Man", fr: "Témoin du marié" }, photo: "" },
-      { name: "Add Name", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "" },
-      { name: "Add Name", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "" },
-      { name: "Add Name", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "" },
+      { name: "Franck", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "/images/wedding-party/franck.webp" },
+      { name: "Rodrigue", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "/images/wedding-party/rodrigue.webp" },
     ],
   },
 

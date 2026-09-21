@@ -91,6 +91,25 @@ is missing, the mute/unmute button doesn't render at all (no broken button,
 no failed network request, no console error). Set `config.music.enabled =
 false` to remove the button regardless of whether the files are present.
 
+### Envelope artwork
+
+The envelope gate is drawn entirely in code, from the theme colours — there
+is no image asset to replace:
+
+- `src/utils/damask.js` generates the baroque damask (serrated acanthus
+  leaves, scroll stems ending in curls, a fleur-de-lis crest) as one SVG
+  `<pattern>` tile on a half-drop repeat, so it stays sharp at any size.
+- `src/utils/envelopeArt.js` builds the fold-seam shading, the flap edges and
+  the wax seal (gradients for the bevel and gloss, an emblem, `D&A` on top).
+- Colours come from `config.theme` (`accent`, `accentSoft`, `primary`,
+  `primaryDeep`, `envelope` for the pink lining) via CSS custom properties on
+  `.envelope-box` in `src/styles/main.css` — change the theme, not the art.
+
+`node scripts/envelope-check.mjs shots <dir>` screenshots the envelope
+(closed / mid-open / flash / reveal, add `--fr` for French) and
+`node scripts/envelope-check.mjs perf --throttle=4` profiles the open
+animation's frame times under CPU throttling.
+
 ## Couple photos
 
 Raw JPG/PNG originals live in `assets-source/couple-photos/` — deliberately

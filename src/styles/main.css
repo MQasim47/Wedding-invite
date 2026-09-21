@@ -161,65 +161,139 @@ svg { display: block; }
   pointer-events: none;
 }
 
-/* Full-bleed — fills the whole viewport, no card margin. */
+/* Only the seal button takes pointer events. This is set explicitly on every
+   direct child of the box rather than inherited from the screen because the
+   tap flips the screen's pointer-events (above) — an inherited property, so
+   the flip would otherwise force a style recalc across every instance of the
+   damask pattern in one frame (measured ~140ms at 4x CPU throttle, vs ~15ms
+   with this). Explicit values stop the cascade at the box's children. */
+.envelope-box > * { pointer-events: none; }
+
+/* Full-bleed — fills the whole viewport, no card margin. Every paper, seam
+   and wax tone below is derived from the theme tokens, so config.theme
+   restyles the whole envelope. */
 .envelope-box {
   position: absolute;
   inset: 0;
+  --envelope-paper: color-mix(in srgb, var(--color-background) 88%, var(--color-accent-soft) 12%);
+  --envelope-shade: color-mix(in srgb, var(--color-accent) 45%, #5a3826 55%);
+  --damask-shade: color-mix(in srgb, var(--color-accent) 48%, var(--color-primary) 52%);
+  --damask-lift: color-mix(in srgb, #fff 82%, var(--color-accent-soft) 18%);
+
+  --seal-size: clamp(160px, 52vw, 210px);
+  --seal-hi: color-mix(in srgb, var(--color-accent-soft) 68%, #fff 32%);
+  --seal-gold: var(--color-accent-soft);
+  --seal-gold-mid: var(--color-accent);
+  --seal-gold-deep: color-mix(in srgb, var(--color-accent) 62%, var(--color-primary-deep) 38%);
+  --seal-rose-hi: color-mix(in srgb, var(--color-accent-soft) 55%, var(--color-primary) 45%);
+  --seal-rose: color-mix(in srgb, var(--color-accent) 42%, var(--color-primary) 58%);
+  --seal-rose-deep: color-mix(in srgb, var(--color-primary-deep) 70%, #2a0f14 30%);
+}
+
+/* Soft edge vignette across the whole envelope (flap and body alike) — one
+   static layer, so the paper reads as lit from the centre without either
+   half needing its own gradient to line up. */
+.envelope-box::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 46%, transparent 50%, rgba(var(--color-primary-rgb), 0.13) 100%);
 }
 
 .envelope-back {
   position: absolute;
   inset: 0;
   z-index: 0;
-  background:
-    radial-gradient(circle at 50% 38%, color-mix(in srgb, var(--color-envelope) 100%, white 6%), transparent 70%),
-    var(--color-envelope);
+  background: var(--envelope-paper);
 }
 
-/* The classic envelope-flap X seam — see envelopeFoldLinesSVG(). */
-.envelope-fold-lines {
+/* The damask layers (body and flap): an SVG <pattern>, so it stays sharp at
+   any size. The flap is promoted to its own layer up front (will-change on
+   .envelope-flap), so its pattern is rasterised once before the tap and only
+   translated while it animates — a trace of the open sequence shows no
+   repaint of it. */
+.envelope-damask,
+.envelope-shade,
+.envelope-flap-edge {
   position: absolute;
   inset: 0;
-  z-index: 1;
   width: 100%;
   height: 100%;
 }
-.envelope-fold-lines line { stroke: rgba(0, 0, 0, 0.16); stroke-width: 1; }
 
-.envelope-vine {
+/* Subtle paper grain — a tiny tiled noise image, rasterised once. */
+.envelope-grain {
   position: absolute;
-  top: 50%;
-  width: 56px;
-  height: 58%;
-  transform: translateY(-50%);
-  color: var(--color-accent);
-  z-index: 1;
-  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.3)) drop-shadow(0 -1px 0.5px rgba(0, 0, 0, 0.25));
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.55;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='4' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.42  0 0 0 0 0.32  0 0 0 0 0.22  0 0 0 0.5 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size: 180px 180px;
 }
-.envelope-vine-svg { width: 100%; height: 100%; display: block; }
-.envelope-vine-left { left: 8%; }
-.envelope-vine-right { right: 8%; transform: translateY(-50%) scaleX(-1); }
 
-/* Top flap — a triangle whose apex sits at the exact vertical/horizontal
-   center of the screen, matching where the two fold lines above cross. */
+/* Fold seams + the soft inner shadow the flap and pocket cast on the sides. */
+.envelope-shade { z-index: 1; }
+.envelope-shade .seam-shadow { fill: none; stroke: var(--envelope-shade); stroke-opacity: 0.2; stroke-width: 3px; }
+.envelope-shade .seam-line { fill: none; stroke: var(--color-accent); stroke-opacity: 0.55; stroke-width: 1px; }
+.envelope-shade .seam-light { fill: none; stroke: #fff; stroke-opacity: 0.85; stroke-width: 1px; }
+
+/* Pink lining — the only thing visible in the V once the flap lifts. Inset a
+   couple of px so no pink fringe shows around the flap's antialiased edge. */
+.envelope-liner {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 50%;
+  clip-path: polygon(2px 0, calc(100% - 2px) 0, 50% calc(100% - 3px));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-envelope) 68%, #fff 32%) 0%,
+    var(--color-envelope) 55%,
+    color-mix(in srgb, var(--color-primary) 78%, var(--color-envelope) 22%) 100%
+  );
+  z-index: 2;
+}
+
+/* Top flap — a triangle whose apex sits at the exact centre of the screen,
+   where the four seams meet. The wrapper carries the cast shadow (a
+   clip-path on the face would clip a box-shadow away) and is pre-promoted to
+   its own layer, so the damask is rasterised once, before the tap. */
 .envelope-flap {
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 50%;
-  clip-path: polygon(0 0, 100% 0, 50% 100%);
-  background: linear-gradient(160deg, var(--color-envelope), color-mix(in srgb, var(--color-envelope) 70%, black 15%));
   z-index: 3;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+  will-change: transform;
+  filter: drop-shadow(0 7px 8px rgba(70, 42, 26, 0.3));
 }
 
-/* Golden glow revealed inside the V once the flap moves away — same
-   position/shape as the flap so there's no seam when it's uncovered. */
+.envelope-flap-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  background: var(--envelope-paper);
+}
+
+.envelope-flap-edge .flap-line { fill: none; stroke: var(--color-accent); stroke-opacity: 0.6; stroke-width: 1px; }
+.envelope-flap-edge .flap-light { fill: none; stroke: #fff; stroke-opacity: 0.9; stroke-width: 1px; transform: translate(0, -0.3px); }
+
+/* Golden glow revealed inside the V once the flap moves away, rimmed in
+   pink — same position/shape as the flap so there's no seam when uncovered. */
 .envelope-glow {
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 50%;
-  clip-path: polygon(0 0, 100% 0, 50% 100%);
-  background: radial-gradient(circle at 50% 15%, #ffdf9e, #f2a94f 55%, transparent 78%);
+  clip-path: polygon(2px 0, calc(100% - 2px) 0, 50% calc(100% - 3px));
+  background: radial-gradient(
+    circle at 50% 14%,
+    #fff8e0 0%,
+    #ffe6a8 22%,
+    color-mix(in srgb, var(--color-accent-soft) 78%, transparent) 46%,
+    rgba(var(--color-primary-rgb), 0.5) 70%,
+    transparent 88%
+  );
   z-index: 2;
   opacity: 0;
 }
@@ -242,16 +316,18 @@ svg { display: block; }
 
 .envelope-seal {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 92px;
-  height: 92px;
+  top: calc(50% - var(--seal-size) / 2);
+  left: calc(50% - var(--seal-size) / 2);
+  width: var(--seal-size);
+  height: var(--seal-size);
   z-index: 5;
+  will-change: transform;
 }
 
 .envelope-seal-btn {
   all: unset;
+  /* after `all: unset` on purpose — unset would reset this to the inherited none */
+  pointer-events: auto;
   cursor: pointer;
   position: relative;
   display: flex;
@@ -259,6 +335,12 @@ svg { display: block; }
   justify-content: center;
   width: 100%;
   height: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+.envelope-seal-btn:focus-visible {
+  outline: 2px solid var(--color-primary-deep);
+  outline-offset: 6px;
+  border-radius: 50%;
 }
 
 .envelope-seal-shape {
@@ -266,28 +348,32 @@ svg { display: block; }
   inset: 0;
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
+  overflow: visible;
 }
 
 .envelope-seal-initials {
   position: relative;
-  color: var(--color-primary-deep);
+  margin-top: 26%;
+  color: color-mix(in srgb, var(--color-primary-deep) 80%, #2a0f14 20%);
   font-family: var(--font-script);
-  font-size: 1.7rem;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+  font-size: calc(var(--seal-size) * 0.22);
+  line-height: 1;
+  text-shadow: 0 1.5px 0 rgba(255, 244, 214, 0.75), 0 -0.5px 0 rgba(70, 30, 20, 0.35);
 }
 
 .envelope-hint {
   position: absolute;
-  top: calc(50% + 62px);
+  top: calc(50% + var(--seal-size) / 2 + 12px);
   left: 50%;
   transform: translateX(-50%);
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--color-primary-deep);
   font-family: var(--font-serif);
   font-style: italic;
+  font-weight: 600;
   font-size: 0.95rem;
   letter-spacing: 0.01em;
   white-space: nowrap;
+  text-shadow: 0 0 8px rgba(255, 252, 246, 0.95), 0 0 3px rgba(255, 252, 246, 0.95);
   z-index: 5;
 }
 

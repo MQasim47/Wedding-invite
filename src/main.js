@@ -153,7 +153,7 @@ if (audioAvailable) {
 }
 
 // --- Envelope gate -----------------------------------------------------
-const { node: envelopeNode, sealBtn, flap, sealEl, glowEl, sparkleCanvas, flashEl, hintEl } = createEnvelopeSection();
+const { node: envelopeNode, sealBtn, flap, sealEl, glowEl, sparkleCanvas, flashEl, hintEl, disconnect } = createEnvelopeSection();
 const pulseTween = idlePulse(sealBtn);
 
 sealBtn.addEventListener(
@@ -171,6 +171,7 @@ sealBtn.addEventListener(
     }
 
     playOpenSequence({ screenNode: envelopeNode, flap, sealEl, glowEl, sparkleCanvas, flashEl, hintEl, pulseTween }).then(() => {
+      disconnect();
       document.documentElement.style.overflow = "";
       lenis?.start();
       controls.show();

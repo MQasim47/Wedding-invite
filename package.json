@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "optimize:photos": "node scripts/optimize-photos.mjs",
-    "generate:og": "node scripts/generate-og-image.mjs"
+    "generate:og": "node scripts/generate-og-image.mjs",
+    "optimize:party": "node scripts/optimize-party-photos.mjs"
   },
   "devDependencies": {
     "playwright": "^1.63.0",

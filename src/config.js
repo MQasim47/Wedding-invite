@@ -107,21 +107,27 @@ export const config = {
 
   // Dedicated section between "Our Story" and the calendar. Leave `photo`
   // empty for a drawn silhouette placeholder — drop a real optimized photo
-  // path in later (see couple.photo above for the pipeline). The first
-  // entry in each list renders larger (a layout detail, not a role — no
-  // Maid of Honor / Best Man has been named yet, so everyone below is a
-  // plain Bridesmaid/Groomsman). Add more entries as the client sends
-  // them; each needs a square face-centered photo (see
-  // public/images/wedding-party/README.md).
+  // path in later (see couple.photo above for the pipeline). An entry with
+  // `lead: true` (the Maid of Honor / Best Man) is shown larger, on a row of
+  // its own with a double gold ring; everyone else sits in a grid beneath.
+  // Add more entries as the client sends them; each needs a square
+  // face-centered photo (see public/images/wedding-party/README.md).
   weddingParty: {
     enabled: true,
     bridesmaids: [
+      { name: "Rita", role: { en: "Maid of Honor", fr: "Témoin de la mariée" }, photo: "/images/wedding-party/rita.webp", lead: true },
       { name: "Irene", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "/images/wedding-party/irene.webp" },
-      { name: "Lovelyne", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "/images/wedding-party/lovelyne.webp" },
+      { name: "Lovelyn", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "/images/wedding-party/lovelyn.webp" },
+      { name: "Liliane", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "/images/wedding-party/liliane.webp" },
+      { name: "Marie", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "/images/wedding-party/marie.webp" },
+      { name: "Nadège", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "/images/wedding-party/nadege.webp" },
+      { name: "Vanilla", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "/images/wedding-party/vanilla.webp" },
     ],
     groomsmen: [
-      { name: "Franck", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "/images/wedding-party/franck.webp" },
+      { name: "Franck", role: { en: "Best Man", fr: "Témoin du marié" }, photo: "/images/wedding-party/franck.webp", lead: true },
       { name: "Rodrigue", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "/images/wedding-party/rodrigue.webp" },
+      { name: "Roger", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "/images/wedding-party/roger.webp" },
+      { name: "Pecos", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "/images/wedding-party/pecos.webp" },
     ],
   },
 

@@ -3,16 +3,29 @@ import { config } from "../config.js";
 import { t, getLang } from "../utils/store.js";
 import { silhouetteAvatarSVG } from "../utils/icons.js";
 
-function ringSVG() {
-  return `<svg class="party-ring" viewBox="0 0 100 100" aria-hidden="true"><circle class="party-ring-circle" cx="50" cy="50" r="47" /></svg>`;
+// The lead (Maid of Honor / Best Man) gets a second, hairline ring outside the
+// drawn one — static, so it simply fades in with the photo.
+function ringSVG(isLead) {
+  const outer = isLead ? `<circle class="party-ring-outer" cx="50" cy="50" r="49.6" />` : "";
+  return `<svg class="party-ring" viewBox="0 0 100 100" aria-hidden="true">${outer}<circle class="party-ring-circle" cx="50" cy="50" r="47" /></svg>`;
 }
 
-function buildMember(person, kind, isLead) {
+// Columns for the members under a group's lead. Three across when the count
+// divides evenly, else two when it does, so the last row is never a lone
+// member; anything else falls back to three with the short row centred.
+function columnsFor(count) {
+  if (count % 3 === 0) return 3;
+  if (count % 2 === 0) return 2;
+  return Math.min(count, 3) || 1;
+}
+
+function buildMember(person, kind) {
+  const isLead = person.lead === true;
   const photoInner = person.photo
     ? el("img", { src: person.photo, alt: person.name, loading: "lazy", decoding: "async" })
     : fromHTML(silhouetteAvatarSVG(kind));
 
-  const photoWrap = el("div", { class: "party-photo-wrap" }, [fromHTML(ringSVG()), el("div", { class: "party-photo" }, [photoInner])]);
+  const photoWrap = el("div", { class: "party-photo-wrap" }, [fromHTML(ringSVG(isLead)), el("div", { class: "party-photo" }, [photoInner])]);
 
   const nameEl = el("p", { class: "party-name" }, person.name);
   const roleEl = el("p", { class: "party-role" }, person.role[getLang()] || person.role.en);
@@ -26,9 +39,10 @@ function buildMember(person, kind, isLead) {
   return { memberEl, roleEl, person };
 }
 
-// Config-driven wedding party section, placed after "Our Story". Photos are
-// drawn silhouette placeholders (see utils/icons.js) until real photos are
-// added to config — swapping in a real photo needs no code change.
+// Config-driven wedding party section, placed after "Our Story". A member
+// with `lead: true` is featured on a row of its own; the rest fill a grid.
+// Photos are drawn silhouette placeholders (see utils/icons.js) until real
+// photos are added to config — swapping in a real photo needs no code change.
 export function createWeddingPartySection() {
   const { weddingParty } = config;
   if (!weddingParty?.enabled) return null;
@@ -37,11 +51,19 @@ export function createWeddingPartySection() {
   const bridesmaidsHeading = el("h3", { class: "party-group-title" }, t().weddingParty.bridesmaids);
   const groomsmenHeading = el("h3", { class: "party-group-title" }, t().weddingParty.groomsmen);
 
-  const bridesmaidEntries = weddingParty.bridesmaids.map((p, i) => buildMember(p, "bridesmaid", i === 0));
-  const groomsmenEntries = weddingParty.groomsmen.map((p, i) => buildMember(p, "groomsman", i === 0));
+  const bridesmaidEntries = weddingParty.bridesmaids.map((p) => buildMember(p, "bridesmaid"));
+  const groomsmenEntries = weddingParty.groomsmen.map((p) => buildMember(p, "groomsman"));
 
-  const bridesmaidsGrid = el("div", { class: "party-grid" }, bridesmaidEntries.map((e) => e.memberEl));
-  const groomsmenGrid = el("div", { class: "party-grid" }, groomsmenEntries.map((e) => e.memberEl));
+  const buildGrid = (entries) => {
+    const rest = entries.filter((e) => !e.person.lead).length;
+    return el(
+      "div",
+      { class: "party-grid", style: `--party-cols: ${columnsFor(rest)}` },
+      entries.map((e) => e.memberEl)
+    );
+  };
+  const bridesmaidsGrid = buildGrid(bridesmaidEntries);
+  const groomsmenGrid = buildGrid(groomsmenEntries);
 
   const node = el("section", { class: "section wedding-party", id: "wedding-party" }, [
     title,

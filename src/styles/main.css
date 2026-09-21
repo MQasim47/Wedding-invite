@@ -797,27 +797,35 @@ svg { display: block; }
   margin-bottom: 22px;
 }
 
+/* Flex rather than grid so a short last row is centred, not left-aligned.
+   --party-cols is set per group in JS (columnsFor) so no row is left with a
+   single member; the lead always takes a full row of its own. */
 .party-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 30px 16px;
+  --party-gap-x: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px var(--party-gap-x);
 }
 
-.party-member--lead {
-  grid-column: 1 / -1;
+.party-member {
+  flex: 0 0 calc((100% - (var(--party-cols, 3) - 1) * var(--party-gap-x)) / var(--party-cols, 3));
+  min-width: 0;
 }
+
+.party-member--lead { flex-basis: 100%; }
 
 .party-photo-wrap {
   position: relative;
-  width: 92px;
-  height: 92px;
+  width: min(92px, 100%);
+  aspect-ratio: 1;
   margin: 0 auto 10px;
   transition: transform 0.25s var(--ease-elegant);
 }
 
 .party-member--lead .party-photo-wrap {
-  width: 122px;
-  height: 122px;
+  width: 132px;
+  margin-bottom: 14px;
 }
 
 .party-photo-wrap:hover,
@@ -864,7 +872,7 @@ svg { display: block; }
   color: var(--color-text);
 }
 
-.party-member--lead .party-name { font-size: 1.1rem; }
+.party-member--lead .party-name { font-size: 1.2rem; }
 
 .party-role {
   margin-top: 2px;
@@ -873,6 +881,34 @@ svg { display: block; }
   letter-spacing: 0.08em;
   color: var(--color-label);
 }
+
+/* The Maid of Honor / Best Man: a second hairline ring around the gold one,
+   and the title set between two gold rules. */
+.party-ring-outer {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 0.7;
+  opacity: 0.75;
+}
+
+.party-member--lead .party-role {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 4px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.party-member--lead .party-role::before,
+.party-member--lead .party-role::after {
+  content: "";
+  flex: 0 1 28px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-accent));
+}
+.party-member--lead .party-role::after { transform: scaleX(-1); }
 
 /* ---------------------------------------------------------------------- */
 /* Calendar                                                                */

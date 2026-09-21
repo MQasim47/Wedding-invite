@@ -52,7 +52,7 @@ touch component or animation code to update real details.
 | `extras.gallery` | `{ enabled, images: [{ src, alt: { en, fr }, position }] }` — `src` must point at an optimized file (see [Couple photos](#couple-photos)) |
 | `extras.dressCode` / `extras.gifts` | Each has an `enabled` flag — set `true` and fill in the fields to show that section |
 | `companion` | The floating couple illustration that follows scroll — see [Companion illustration](#companion-illustration) |
-| `weddingParty` | `{ enabled, bridesmaids: [{ name, role: { en, fr }, photo }], groomsmen: [...] }` — the first entry in each list renders as Maid of Honor / Best Man (larger). Leave `photo` empty for a drawn silhouette placeholder; point it at an optimized file (see [Couple photos](#couple-photos)) to use a real photo |
+| `weddingParty` | `{ enabled, bridesmaids: [{ name, role: { en, fr }, photo, lead? }], groomsmen: [...] }` — an entry with `lead: true` (the Maid of Honor / Best Man) is shown larger with a double gold ring; the rest fill a 3-across grid (2-across if that avoids a lone member in the last row). Leave `photo` empty for a drawn silhouette placeholder; point it at an optimized file (see [Couple photos](#couple-photos)) to use a real photo |
 | `meta` | Page `<title>`, description, `ogImage` path, and `siteUrl` — these drive the SEO/Open Graph tags injected into `index.html` at build time |
 
 ### `src/i18n.js` — all UI strings

@@ -47,7 +47,7 @@ touch component or animation code to update real details.
 | `music.enabled` / `music.tracks` | Toggle background music and its playlist (see [Music](#music)) |
 | `rsvp.enabled` | Set `false` to hide the RSVP section entirely |
 | `rsvp.deadline` | `YYYY-MM-DD`, shown above the form. Once the guest's local clock passes 23:59 on this date, the form is replaced by a closed message (both languages) instead of accepting new responses |
-| `rsvp.endpoint` | Your deployed Google Apps Script URL (see [RSVP setup](#rsvp-setup)) — leave empty for demo mode |
+| `rsvp.endpoint` | Your deployed Google Apps Script URL (see [RSVP setup](#rsvp-setup)). There is no demo mode: with this empty, submitting the form shows an error, never a fake success |
 | `rsvp.maxGuests` | Upper bound on the guest-count stepper |
 | `extras.gallery` | `{ enabled, images: [{ src, alt: { en, fr }, position }] }` — `src` must point at an optimized file (see [Couple photos](#couple-photos)) |
 | `extras.dressCode` / `extras.gifts` | Each has an `enabled` flag — set `true` and fill in the fields to show that section |
@@ -184,9 +184,22 @@ Full step-by-step instructions are in
 3. Deploy it as a Web App ("Execute as: Me", "Who has access: Anyone").
 4. Paste the resulting URL into `config.rsvp.endpoint`.
 
-Until you do this, `rsvp.endpoint` is an empty string and the form runs in
-**demo mode**: submissions show a success state but aren't actually sent, and
-a warning is logged to the browser console.
+Until you do this, `rsvp.endpoint` is an empty string and submitting the form
+shows an error (and logs why to the browser console) — it never shows a fake
+success. Once it's set, every failure (no connection, an HTTP error, a
+response that isn't `{"ok":true}`, or no answer within 30 seconds) shows a
+styled error and lets the guest retry; while a request is in flight the button
+is disabled and shows a spinner, so it can't be double-submitted. Each attempt
+carries a `submissionId` that the backend uses to ignore a retry of a request
+that had actually landed.
+
+Each submission becomes one row: timestamp, name, attending, guests, message,
+language (`en`/`fr`), the `?guest=` value, the client's submit time and the
+submission id.
+
+`node scripts/rsvp-check.mjs mock <dir>` exercises every state against a mocked
+endpoint (EN and FR) and the deadline switch; `node scripts/rsvp-check.mjs live
+<endpoint-url>` submits one real test entry through the real form.
 
 ## Personalized greeting (`?guest=`)
 
@@ -203,8 +216,10 @@ Things worth manually re-checking after any content change:
 - Language switching (`language: "en"`, `"fr"`, and `"bilingual"` with the
   toggle button) translates every section, including form labels, errors,
   event times (12h EN / 24h FR), dress codes, and venue cards.
-- RSVP demo mode: submit the form with `rsvp.endpoint` empty and confirm the
-  success state and console warning appear.
+- RSVP with `rsvp.endpoint` empty: submit the form and confirm an error
+  appears (never a success).
+- RSVP end to end: submit a real entry (`node scripts/rsvp-check.mjs live <url>`
+  or by hand) and confirm the row in the sheet.
 - RSVP-after-deadline: temporarily set `rsvp.deadline` to a past date and
   confirm the form is replaced by the closed message in both languages.
 - Countdown-after-date: temporarily set `weddingDate` to a past date and

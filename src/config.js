@@ -209,7 +209,7 @@ export const config = {
   rsvp: {
     enabled: true,
     deadline: "2026-10-15",
-    endpoint: "", // Google Apps Script web app URL — empty string = demo mode
+    endpoint: "", // Google Apps Script web app URL (rsvp-backend/SETUP.md). Required: while empty, submitting the form shows an error — there is no demo mode
     maxGuests: 6,
   },
 

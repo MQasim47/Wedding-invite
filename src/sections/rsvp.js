@@ -21,6 +21,68 @@ function isDeadlinePassed() {
   return Date.now() > new Date(`${config.rsvp.deadline}T23:59:59`).getTime();
 }
 
+// Apps Script cold starts can take several seconds, so a slow response is
+// normal — tell the guest we're still working after SLOW_AFTER_MS, and give up
+// (with a retryable error) only after TIMEOUT_MS.
+const SLOW_AFTER_MS = 8000;
+const TIMEOUT_MS = 30000;
+
+class RsvpError extends Error {
+  constructor(kind) {
+    super(kind);
+    this.kind = kind; // "config" | "network" | "timeout" | "server"
+  }
+}
+
+// One id per RSVP attempt, reused if the guest retries after a timeout: the
+// backend ignores a second submission carrying an id it has already stored,
+// so a request that landed after we stopped waiting can't create a duplicate row.
+function newSubmissionId() {
+  if (globalThis.crypto?.randomUUID) return crypto.randomUUID();
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+async function sendRsvp(payload) {
+  const endpoint = config.rsvp.endpoint;
+  if (!endpoint) {
+    console.error("[RSVP] config.rsvp.endpoint is empty — nothing was sent. Set it to the Apps Script web app URL.");
+    throw new RsvpError("config");
+  }
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  let response;
+  try {
+    // text/plain keeps this a "simple" request, so the browser skips the CORS
+    // preflight that Apps Script web apps can't answer.
+    response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+  } catch (err) {
+    throw new RsvpError(controller.signal.aborted ? "timeout" : "network");
+  } finally {
+    clearTimeout(timer);
+  }
+
+  if (!response.ok) throw new RsvpError("server");
+
+  // Apps Script answers HTTP 200 even when its own code fails, so the body's
+  // `ok` flag is the real success signal.
+  let body;
+  try {
+    body = await response.json();
+  } catch {
+    throw new RsvpError("server");
+  }
+  if (!body || body.ok !== true) {
+    console.error("[RSVP] backend rejected the submission:", body);
+    throw new RsvpError("server");
+  }
+}
+
 export function createRsvpSection() {
   if (!config.rsvp.enabled) return null;
 
@@ -45,6 +107,9 @@ export function createRsvpSection() {
 
   let attending = null; // "yes" | "no"
   let guestCount = 1;
+  let inFlight = false;
+  let submissionId = newSubmissionId();
+  let statusState = null; // { kind, key } — re-rendered on language change
 
   const deadlineEl = el("p", { class: "rsvp-deadline" });
 
@@ -98,7 +163,11 @@ export function createRsvpSection() {
   });
 
   const submitBtn = el("button", { class: "btn rsvp-submit-btn", type: "submit" }, t().rsvp.submit);
-  const statusEl = el("p", { class: "rsvp-status", role: "status" });
+  const statusText = el("span", { class: "rsvp-status-text" });
+  const statusEl = el("div", { class: "rsvp-status", role: "status", hidden: true }, [
+    el("span", { class: "rsvp-status-icon", html: icons.alert }),
+    statusText,
+  ]);
 
   const form = el("form", { class: "rsvp-form", novalidate: "true" }, [
     el("div", { class: "field" }, [nameLabel, nameInput, nameError]),
@@ -147,12 +216,42 @@ export function createRsvpSection() {
     guestValueEl.textContent = String(guestCount);
   });
 
+  const controls = [nameInput, messageInput, yesBtn, noBtn, decBtn, incBtn];
+
+  // `key` is an i18n key under t().rsvp, so the message follows a language
+  // switch while it's on screen. kind: "error" | "slow" | null (clear).
+  function setStatus(kind, key) {
+    statusState = kind ? { kind, key } : null;
+    statusEl.hidden = !kind;
+    if (!kind) {
+      statusEl.removeAttribute("data-kind");
+      statusText.textContent = "";
+      return;
+    }
+    statusEl.setAttribute("data-kind", kind);
+    statusEl.setAttribute("role", kind === "error" ? "alert" : "status");
+    statusText.textContent = t().rsvp[key];
+  }
+
+  function setSending(sending) {
+    inFlight = sending;
+    submitBtn.disabled = sending;
+    submitBtn.classList.toggle("is-loading", sending);
+    submitBtn.textContent = sending ? t().rsvp.submitting : t().rsvp.submit;
+    form.setAttribute("aria-busy", String(sending));
+    controls.forEach((c) => (c.disabled = sending));
+  }
+
   async function handleSubmit(evt) {
     evt.preventDefault();
+    // A second submit while one is in flight (Enter key, double tap) must not
+    // start another request — the disabled button alone doesn't cover Enter.
+    // Nor may a form that has already been submitted successfully go again.
+    if (inFlight || form.hidden) return;
+
     nameError.textContent = "";
     attendingError.textContent = "";
-    statusEl.textContent = "";
-    statusEl.removeAttribute("data-kind");
+    setStatus(null);
 
     const name = nameInput.value.trim();
     let hasError = false;
@@ -176,37 +275,30 @@ export function createRsvpSection() {
       attending,
       guests: attending === "yes" ? guestCount : 0,
       message: messageInput.value.trim(),
+      language: getLang(),
       guestParam: getGuestName(),
       submittedAt: new Date().toISOString(),
+      submissionId,
     };
 
-    submitBtn.disabled = true;
-    submitBtn.textContent = t().rsvp.submitting;
+    setSending(true);
+    const slowTimer = setTimeout(() => setStatus("slow", "slowNotice"), SLOW_AFTER_MS);
 
     try {
-      if (!config.rsvp.endpoint) {
-        console.warn("[RSVP] Demo mode: no rsvp.endpoint configured in config.js — submission was not sent.", payload);
-        await new Promise((resolve) => setTimeout(resolve, 600));
-        statusEl.textContent = t().rsvp.demoNotice;
-        statusEl.setAttribute("data-kind", "demo");
-        showSuccess();
-        return;
-      }
-
-      const response = await fetch(config.rsvp.endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) throw new Error(`Request failed: ${response.status}`);
-      showSuccess();
+      await sendRsvp(payload);
     } catch (err) {
-      statusEl.textContent = t().rsvp.errorGeneric;
-      statusEl.setAttribute("data-kind", "error");
-      submitBtn.disabled = false;
-      submitBtn.textContent = t().rsvp.submit;
+      clearTimeout(slowTimer);
+      const key = { network: "errorNetwork", timeout: "errorTimeout", server: "errorServer" }[err.kind] || "errorGeneric";
+      setSending(false);
+      setStatus("error", key);
+      return;
     }
+
+    clearTimeout(slowTimer);
+    setStatus(null);
+    setSending(false);
+    submissionId = newSubmissionId();
+    showSuccess();
   }
 
   function showSuccess() {
@@ -240,7 +332,8 @@ export function createRsvpSection() {
     guestsLabel.textContent = t().rsvp.guests;
     messageLabel.textContent = t().rsvp.message;
     messageInput.placeholder = t().rsvp.messagePlaceholder;
-    submitBtn.textContent = submitBtn.disabled ? t().rsvp.submitting : t().rsvp.submit;
+    submitBtn.textContent = inFlight ? t().rsvp.submitting : t().rsvp.submit;
+    if (statusState) statusText.textContent = t().rsvp[statusState.key];
     successTitle.textContent = t().rsvp.successTitle;
     successMsg.textContent = t().rsvp.successMessage;
   }

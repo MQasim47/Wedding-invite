@@ -163,6 +163,9 @@ export const config = {
       { name: "Rodrigue", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "/images/wedding-party/rodrigue.webp" },
       { name: "Roger", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "/images/wedding-party/roger.webp" },
       { name: "Pecos", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "/images/wedding-party/pecos.webp" },
+      { name: "Arnaud", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "/images/wedding-party/arnaud.webp" },
+      { name: "Serge", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "/images/wedding-party/serge.webp" },
+      { name: "George", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "/images/wedding-party/george.webp" },
     ],
   },
 

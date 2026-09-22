@@ -5,5 +5,8 @@
   "nadege": { "cx": 604, "cy": 787, "face": 415, "lift": 0.3 },
   "vanilla": { "cx": 608, "cy": 433, "face": 444 },
   "roger": { "cx": 536, "cy": 475, "face": 416 },
-  "pecos": { "cx": 487, "cy": 353, "face": 364 }
+  "pecos": { "cx": 487, "cy": 353, "face": 364 },
+  "arnaud": { "cx": 604, "cy": 718, "face": 462 },
+  "george": { "cx": 573, "cy": 398, "face": 377 },
+  "serge": { "cx": 705, "cy": 371, "face": 397 }
 }

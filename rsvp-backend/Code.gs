@@ -37,14 +37,15 @@ function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
 
-    var name = sanitize_(data.name);
+    var name = sanitize_(pick_(data, ["name", "fullName"]));
     var attending = data.attending === "yes" ? "yes" : data.attending === "no" ? "no" : "";
-    var guests = attending === "yes" ? Math.min(Math.max(Math.floor(Number(data.guests)) || 1, 1), MAX_GUESTS) : 0;
+    var guestsRaw = pick_(data, ["guests", "guestCount"]);
+    var guests = attending === "yes" ? Math.min(Math.max(Math.floor(Number(guestsRaw)) || 1, 1), MAX_GUESTS) : 0;
     var message = sanitize_(data.message);
-    var language = data.language === "fr" ? "fr" : "en";
-    var guestParam = sanitize_(data.guestParam);
+    var language = pick_(data, ["language", "lang", "locale"]) === "fr" ? "fr" : "en";
+    var guestParam = sanitize_(pick_(data, ["guestParam", "guest", "invitee"]));
     var submittedAt = sanitize_(data.submittedAt) || new Date().toISOString();
-    var submissionId = sanitize_(data.submissionId);
+    var submissionId = sanitize_(pick_(data, ["submissionId", "submission_id", "id"]));
 
     if (!name || !attending) {
       return jsonResponse_({ ok: false, error: "Missing required fields." });
@@ -133,6 +134,17 @@ function idExists_(sheet, col, id) {
     if (String(ids[i][0]) === id) return true;
   }
   return false;
+}
+
+// Returns the first present, non-empty field among several accepted
+// spellings — the frontend sends one set of names, but a hand-crafted or
+// third-party POST (a form builder, a manual test) might use another.
+function pick_(data, keys) {
+  for (var i = 0; i < keys.length; i++) {
+    var v = data[keys[i]];
+    if (v !== undefined && v !== null && v !== "") return v;
+  }
+  return "";
 }
 
 function sanitize_(value) {

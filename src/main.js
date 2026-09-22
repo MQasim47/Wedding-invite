@@ -14,6 +14,7 @@ import { animateCalendarHeart } from "./animations/calendarHeart.js";
 import { animateFlowerBand } from "./animations/flowerBand.js";
 import { animateClosing } from "./animations/closing.js";
 import { animateWeddingParty } from "./animations/weddingParty.js";
+import { initDecor } from "./animations/decor.js";
 import { initCompanionAnimations } from "./animations/companion.js";
 import { el } from "./utils/dom.js";
 
@@ -79,6 +80,10 @@ const flowerBand = registerSection(createFlowerBandSection());
 registerSection(createRsvpSection());
 createExtrasSections().forEach(registerSection);
 const closingSection = registerSection(createClosingSection());
+
+// Interior decoration (config.decor). Markup is created now but stays unpainted
+// until decor.reveal() runs after the envelope has gone.
+const decor = initDecor({ appShell, heroSection, closingSection });
 
 // __AUDIO_AVAILABLE__ is a build-time constant (see vite.config.js) — true
 // only when config.music.enabled AND the configured file actually exists on
@@ -200,6 +205,7 @@ sealBtn.addEventListener(
         if (weddingPartySection) animateWeddingParty(weddingPartySection.node);
         if (flowerBand) animateFlowerBand(flowerBand.node);
         if (closingSection) animateClosing(closingSection);
+        decor.reveal();
         if (companion) {
           initCompanionAnimations({
             node: companion.node,

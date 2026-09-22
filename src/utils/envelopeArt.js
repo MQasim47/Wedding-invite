@@ -9,7 +9,7 @@ export const DAMASK_ID = "env-damask";
 // Pattern scale on screen. 1.2 puts one motif column at ~60% of a 390px
 // phone width, so the crest and scrolls read at the same scale as the
 // reference invitation.
-const DAMASK_SCALE = 1.2;
+export const DAMASK_SCALE = 1.2;
 
 // patternTransform that centres one motif column on the envelope's vertical
 // axis and puts a motif junction (not a crest) under the seal, so the

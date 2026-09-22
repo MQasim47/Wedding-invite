@@ -1464,7 +1464,6 @@ svg { display: block; }
 .closing {
   position: relative;
   text-align: center;
-  background: var(--color-background);
   color: var(--color-text);
   padding-bottom: 40px;
   overflow: hidden;
@@ -1554,6 +1553,157 @@ svg { display: block; }
   opacity: 0.75;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Interior decoration (config.decor) — see animations/decor.js            */
+/* ---------------------------------------------------------------------- */
+/* Gold family, derived from the theme exactly as the wax seal's is. */
+:root {
+  --decor-gold-hi: color-mix(in srgb, var(--color-accent-soft) 68%, #fff 32%);
+  --decor-gold-mid: var(--color-accent);
+  --decor-gold-deep: color-mix(in srgb, var(--color-accent) 62%, var(--color-primary-deep) 38%);
+  --decor-gold-plate-hi: color-mix(in srgb, var(--color-accent-soft) 40%, var(--color-background) 60%);
+  --decor-gold-plate-lo: color-mix(in srgb, var(--color-accent-soft) 85%, var(--color-background) 15%);
+  --decor-disc-hi: #fff;
+  --decor-disc-lo: color-mix(in srgb, var(--color-accent-soft) 26%, var(--color-background) 74%);
+}
+
+.decor-sprite { position: absolute; width: 0; height: 0; overflow: hidden; pointer-events: none; }
+
+/* Watermark + paper grain: the app shell's FIRST child, so it can only ever
+   sit behind the sections' own content, and never over text. Empty (nothing to
+   paint) until decor.reveal() gives it images after the envelope has gone. */
+.decor-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-repeat: repeat;
+}
+
+/* Artwork inside the sprite's symbols. Plain class selectors on purpose: the
+   symbol content lives in the sprite, so ancestor selectors would not match. */
+.d-fill { fill: url(#decor-gold-plate); }
+.d-line {
+  fill: none;
+  stroke: url(#decor-gold-line);
+  stroke-width: 0.8;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-dasharray: 1.02 1;
+}
+.d-bead { fill: url(#decor-gold-line); }
+.d-disc { fill: url(#decor-disc); }
+.d-ring {
+  fill: none;
+  stroke: url(#decor-gold-line);
+  stroke-width: 5;
+  stroke-dasharray: 1.02 1;
+}
+.d-hair {
+  fill: none;
+  stroke: var(--decor-gold-deep);
+  stroke-opacity: 0.7;
+  stroke-width: 0.8;
+  stroke-dasharray: 1.02 1;
+}
+.d-beads { fill: var(--decor-gold-mid); }
+.d-emblem-shade { fill: var(--decor-gold-deep); opacity: 0.28; }
+.d-emblem-fill {
+  fill: url(#decor-emblem-fill);
+  stroke: var(--decor-gold-deep);
+  stroke-opacity: 0.75;
+  stroke-width: 0.45;
+  stroke-linejoin: round;
+  stroke-dasharray: 1.02 1;
+}
+.d-initials {
+  font-family: var(--font-script);
+  font-size: 27px;
+  fill: color-mix(in srgb, var(--color-primary-deep) 80%, #2a0f14 20%);
+  stroke: color-mix(in srgb, var(--color-primary-deep) 80%, #2a0f14 20%);
+  stroke-width: 0.6px;
+}
+
+/* Placements. Hidden until the reveal; then each one draws (outlines first,
+   gold fills fading in after; the dash is 2% longer than the path so a closed
+   ring leaves no hairline seam) when it scrolls into view. The draw is two
+   INHERITED properties on the <use>, which is how it reaches the symbol. */
+.decor-corner,
+.decor-crest {
+  display: block;
+  pointer-events: none;
+  visibility: hidden;
+  overflow: visible;
+}
+.decor-live .decor-corner,
+.decor-live .decor-crest { visibility: visible; }
+
+.decor-corner use,
+.decor-crest use {
+  stroke-dashoffset: 1.02;
+  fill-opacity: 0;
+  transition: stroke-dashoffset 1.5s cubic-bezier(0.45, 0, 0.2, 1), fill-opacity 0.9s ease 1.05s;
+}
+.decor-corner.is-drawn use,
+.decor-crest.is-drawn use {
+  stroke-dashoffset: 0;
+  fill-opacity: 1;
+}
+
+/* Two opposite corners, tucked inside the section's own padding (64px top and
+   bottom) so an ornament never reaches the content. Specificity beats the RSVP
+   section's "> :not(.rsvp-watermark) { position: relative }". */
+section.section > .decor-corner {
+  position: absolute;
+  z-index: 0;
+  width: 60px;
+  height: 60px;
+  opacity: 0.95;
+}
+section.section > .decor-corner--tl { top: 4px; left: 4px; }
+section.section > .decor-corner--br { bottom: 4px; right: 4px; transform: rotate(180deg); }
+
+/* The D&A crest: once above the names in the hero badge, once in the closing. */
+.decor-crest-wrap { display: flex; justify-content: center; }
+.decor-crest { width: 84px; height: 93px; filter: drop-shadow(0 2px 3px rgba(60, 30, 20, 0.28)); }
+.hero-badge .decor-crest-wrap { margin: -8px 0 8px; }
+/* The crest makes the badge ~93px taller; the wisteria hangs at a % of that
+   height, so it needs the remaining ~50px or its petals reach the date row. */
+.hero.has-crest .hero-floral-left { top: calc(46% + 50px); }
+.closing .decor-crest-wrap { margin-bottom: 10px; position: relative; }
+
+/* Paper: a soft, printed-not-flat emboss on frames and cards — a recessed
+   inner edge on photo frames and coins, a fine highlight under the doily. */
+.decor-paper .story-photo-frame::after,
+.decor-paper .gallery-item::after,
+.decor-paper .party-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(var(--color-accent-rgb), 0.28), inset 0 3px 7px rgba(70, 45, 20, 0.2);
+}
+.decor-paper .gallery-item { position: relative; }
+.decor-paper .party-photo::after { box-shadow: inset 0 0 0 1px rgba(var(--color-accent-rgb), 0.22), inset 0 2px 5px rgba(70, 45, 20, 0.18); }
+.decor-paper .countdown-unit {
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.95), inset 0 -3px 6px rgba(var(--color-primary-deep-rgb), 0.1), 0 1px 0 #fff;
+}
+.decor-paper .welcome-doily-svg { filter: drop-shadow(0 12px 26px rgba(0, 0, 0, 0.1)) drop-shadow(0 1px 0 rgba(255, 255, 255, 0.9)); }
+
+/* Contrast guard. The paper grain and watermark cost the darkest background
+   pixel ~5% of luminance, and two pieces of text had under 4% of headroom over
+   4.5:1 to start with (measured with scripts/decor-check.mjs contrast): the 11px
+   count-down labels (drawn at 85% opacity) and the browser-default placeholder.
+   Both are firmed up only while the decoration is live. */
+.decor-live .countdown-label { opacity: 1; }
+.decor-live ::placeholder { color: color-mix(in srgb, var(--color-text) 72%, var(--color-background)); opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* Flourishes and the crest simply appear: no stroke or fade animation. */
+  .decor-corner use,
+  .decor-crest use { transition: none; stroke-dashoffset: 0; fill-opacity: 1; }
 }
 
 /* ---------------------------------------------------------------------- */

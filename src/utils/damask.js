@@ -208,8 +208,11 @@ function crest(tipY, h) {
   return items;
 }
 
-// The on-axis pieces and the right-hand half (scrolls + calyx leaves).
+// The on-axis pieces and the right-hand half (scrolls + calyx leaves). Built
+// once: the envelope pattern and the page watermark both draw from it.
+let motifCache = null;
 function buildMotif() {
+  if (motifCache) return motifCache;
   const axis = [];
   const half = [];
 
@@ -270,7 +273,8 @@ function buildMotif() {
     })
   );
 
-  return { axis, half };
+  motifCache = { axis, half };
+  return motifCache;
 }
 
 function render(items) {
@@ -283,11 +287,10 @@ function render(items) {
     .join("");
 }
 
-// Builds the <defs> content: the shared shape groups plus the pattern tile.
-// `id` prefixes every def. Colours come from CSS custom properties so the
-// pattern follows the theme (--color-accent) — see .envelope-damask in
-// main.css for the defaults of --damask-shade / --damask-lift.
-export function damaskPatternDefs(id) {
+// The shared shape groups: one mirrored cell placed on the half-drop repeat
+// (`#${id}-tile`, exactly one tile wide and tall — content that crosses the
+// tile edge wraps because the second column is drawn at both y = 0 and y = H).
+function damaskShapes(id) {
   const { axis, half } = buildMotif();
   const cellW = DAMASK_CELL_W;
   const cellH = DAMASK_CELL_H;
@@ -302,7 +305,15 @@ export function damaskPatternDefs(id) {
       <use href="#${id}-half"/>
       <use href="#${id}-half" transform="scale(-1 1)"/>
     </g>
-    <g id="${id}-tile">${place}</g>
+    <g id="${id}-tile">${place}</g>`;
+}
+
+// Builds the <defs> content: the shared shape groups plus the pattern tile.
+// `id` prefixes every def. Colours come from CSS custom properties so the
+// pattern follows the theme (--color-accent) — see .envelope-damask in
+// main.css for the defaults of --damask-shade / --damask-lift.
+export function damaskPatternDefs(id) {
+  return `${damaskShapes(id)}
     <pattern id="${id}" width="${DAMASK_TILE_W}" height="${DAMASK_TILE_H}" patternUnits="userSpaceOnUse" data-damask-pattern>
       <use href="#${id}-tile" transform="translate(1.6 2)" fill="var(--damask-shade)" fill-opacity="0.42"/>
       <use href="#${id}-tile" transform="translate(-1 -1.2)" fill="#fff" fill-opacity="0.9"/>
@@ -314,7 +325,7 @@ export function damaskPatternDefs(id) {
 // acanthus leaves and a pair of curls, centred on (0, 0) within roughly
 // ±30 units. Returns <g id="${id}"> (definitions only — the caller places
 // and colours it with <use>, as the pattern tile does).
-export function damaskEmblem(id) {
+function emblemItems() {
   const axis = crest(-31, 47);
   const half = [
     ...leaf({ x: 3, y: 10, angle: -Math.PI / 2 + 0.95, len: 21, wid: 5.6, lobes: 3, bend: 0.7, phase: 0.2 }),
@@ -326,6 +337,100 @@ export function damaskEmblem(id) {
       stemW: 1.3,
     }),
   ];
+  return { axis, half };
+}
+
+export function damaskEmblem(id) {
+  const { axis, half } = emblemItems();
   return `<g id="${id}-half">${render(half)}</g>
     <g id="${id}">${render(axis)}<use href="#${id}-half"/><use href="#${id}-half" transform="scale(-1 1)"/></g>`;
+}
+
+// The same emblem as ONE compound path (both halves, beads as tiny circles),
+// for places that animate it: an animated <use> restyles every element of its
+// shadow tree each frame, so a 90-element emblem is what makes it expensive.
+export function damaskEmblemPath() {
+  const { axis, half } = emblemItems();
+  const mirror = (dd) => dd.replace(/(-?[\d.]+) (-?[\d.]+)/g, (_, x, y) => `${-x} ${y}`);
+  const shapes = [...axis, ...half].filter((it) => it.d);
+  return (
+    shapes.map((it) => it.d).join("") +
+    half.filter((it) => it.d).map((it) => mirror(it.d)).join("") +
+    [...axis, ...half].filter((it) => it.dot).map((it) => dotPath(it.dot)).join("") +
+    half.filter((it) => it.dot).map((it) => dotPath([-it.dot[0], it.dot[1], it.dot[2]])).join("")
+  );
+}
+
+// A filled circle as path data (so beads can join a compound path).
+export function dotPath([x, y, r]) {
+  return `M${rd(x - r)} ${rd(y)}a${r} ${r} 0 1 0 ${rd(2 * r)} 0a${r} ${r} 0 1 0 ${rd(-2 * r)} 0Z`;
+}
+
+// Swap x/y in every "x y" pair of a poly() path: a reflection across the
+// y = x diagonal, which maps a top-edge arm onto the left edge.
+const transpose = (d) => d.replace(/(-?[\d.]+) (-?[\d.]+)/g, "$2 $1");
+
+// Splits ordered items into what a flat gold plate needs: `plates` (closed
+// shapes, in painting order so later leaves cover earlier ones), `lines`
+// (open veins) and `beads`.
+function plate(items, mirror = false) {
+  const flip = (d) => (mirror ? transpose(d) : d);
+  return {
+    shapes: items.filter((it) => it.d).map((it) => ({ d: flip(it.d), vein: !!it.vein })),
+    beads: items.filter((it) => it.dot).map((it) => (mirror ? [it.dot[1], it.dot[0], it.dot[2]] : it.dot)),
+  };
+}
+
+// Baroque corner bracket, drawn for a top-left corner in a 100 x 100 box
+// whose origin is the corner itself. An acanthus scroll runs along the top
+// edge into a curl, its mirror image runs down the left edge, and a small
+// palmette of three pointed leaves closes the corner between them — the same
+// leaf and scroll vocabulary as the damask. A bottom-right corner is this
+// rotated 180 degrees.
+export function damaskCorner() {
+  const arm = scroll({
+    anchors: [[20, 17], [35, 14.5], [52, 18], [67, 16]],
+    curl: { cx: 66, cy: 30, r0: 14, r1: 3, a0: -Math.PI / 2 + 0.04, dir: 1, turns: 1.3 },
+    leafLen: [21, 10],
+    spacing: 17,
+    stemW: 1.8,
+  });
+  const palm = [];
+  for (const [angle, len, wid, bend] of [[Math.PI / 4, 30, 6.5, 0], [Math.PI / 4 - 0.5, 21, 4.4, -0.3], [Math.PI / 4 + 0.5, 21, 4.4, 0.3]]) {
+    palm.push(...leaf({ x: 11, y: 11, angle, len, wid, lobes: 0, bend }));
+  }
+  palm.push({ dot: [11, 11, 3.2] });
+  return [plate(arm), plate(arm, true), plate(palm)];
+}
+
+// Ornament for the monogram cartouche, in a frame centred on (0, 0) with the
+// oval ring at roughly rx 44 / ry 54: a pair of acanthus scrolls sweeping up
+// the outside of the ring from the bottom (`flank` is the right-hand one — the
+// caller mirrors it) and a three-leaf palmette crowning the top (`crown`).
+export function damaskCartouche() {
+  const flank = scroll({
+    anchors: [[5, 66], [26, 67], [47, 55], [58, 33], [60, 10]],
+    curl: { cx: 68, cy: 8, r0: 8, r1: 2.4, a0: Math.PI, dir: 1, turns: 1.25 },
+    leafLen: [20, 9],
+    spacing: 16,
+    stemW: 1.8,
+  });
+  const crown = [];
+  for (const [angle, len, wid, bend] of [[-Math.PI / 2, 24, 6, 0], [-Math.PI / 2 - 0.72, 19, 4.6, -0.4], [-Math.PI / 2 + 0.72, 19, 4.6, 0.4]]) {
+    crown.push(...leaf({ x: 0, y: -52, angle, len, wid, lobes: 0, bend }));
+  }
+  return { flank: plate(flank), crown: plate(crown) };
+}
+
+// A standalone, transparent, seamlessly tiling SVG of the envelope's damask
+// (the very same motif and half-drop layout as its <pattern>), flat in one
+// colour, for the page watermark. The opacity sits on a GROUP, not on the
+// shapes: the motif is ~100 overlapping polygons, and per-shape alpha stacks
+// wherever they overlap (measured: a 3.5% fill darkened its densest pixels by
+// 10%, which is exactly where text contrast is lost). `scale` is the pattern scale on screen.
+export function damaskTileSVG({ color, opacity, scale }) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${DAMASK_TILE_W * scale}" height="${DAMASK_TILE_H * scale}" viewBox="0 0 ${DAMASK_TILE_W} ${DAMASK_TILE_H}">
+    <defs>${damaskShapes("wm")}</defs>
+    <g opacity="${opacity}"><use href="#wm-tile" fill="${color}"/></g>
+  </svg>`;
 }

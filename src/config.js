@@ -147,6 +147,17 @@ export const config = {
     envelope: "#F2A8C0",
   },
 
+  // Interior decoration — the envelope's damask-and-gold language carried
+  // inside the invitation. Each piece is independent: set any of them to
+  // false to switch it off (the page then looks exactly as it did before).
+  decor: {
+    damaskWatermark: true, // the envelope's damask as a very faint gold watermark behind the whole page
+    cornerFlourishes: true, // ornate gold corner brackets that draw in on the major sections
+    monogram: true, // the D&A crest: once above the names in the hero, once in the closing
+    paperTexture: true, // an ivory paper grain, and a soft embossed shadow on frames and cards
+    damaskOpacity: 0.04, // watermark strength: 0.03–0.05 stays a whisper
+  },
+
   music: {
     // Plays track 1 first, then track 2, then loops back to track 1 —
     // starts on the envelope tap (a real user gesture, so autoplay is never

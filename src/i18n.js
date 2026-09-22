@@ -32,7 +32,7 @@ export const i18n = {
       ],
     },
     schedule: {
-      title: "Wedding Day Schedule",
+      title: "Wedding Weekend",
     },
     venue: {
       title: "Venue",
@@ -120,7 +120,7 @@ export const i18n = {
       ],
     },
     schedule: {
-      title: "DÉROULÉ DE LA JOURNÉE",
+      title: "WEEK-END DE MARIAGE",
     },
     venue: {
       title: "LIEUX",

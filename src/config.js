@@ -61,8 +61,32 @@ export const config = {
   // below), dress code, and an optional extra note — all shown in the
   // timeline, and dress codes are also rolled up under the matching venue
   // card in the Venue section.
+  // The program's days, in order. The schedule section groups schedule[].day
+  // (an index into this array) under these headings on the timeline, and the
+  // calendar highlights every date listed here (the first, full-size; the
+  // rest, smaller — see sections/calendar.js). Adding a third day needs only
+  // a new entry here plus schedule items pointing at it — no code changes.
+  weddingDays: [
+    {
+      date: "2026-12-05",
+      heading: { en: "Saturday, December 5", fr: "Samedi 5 décembre" },
+      shortLabel: { en: "Wedding Day", fr: "Jour du mariage" },
+    },
+    {
+      date: "2026-12-06",
+      heading: { en: "Sunday, December 6", fr: "Dimanche 6 décembre" },
+      shortLabel: { en: "Barbecue", fr: "Barbecue" },
+    },
+  ],
+
+  // `day` is an index into weddingDays above, so the timeline can group
+  // events under the right day heading. `icsStart` (ISO 8601 with offset) is
+  // only needed for an event not already covered by the main ceremony-to-
+  // reception .ics block (see utils/ics.js) — it opts an item into its own
+  // separate calendar entry.
   schedule: [
     {
+      day: 0,
       time: { en: "3:00 PM", fr: "15h00" },
       title: { en: "Wedding Ceremony", fr: "Cérémonie de mariage" },
       icon: "rings",
@@ -74,17 +98,28 @@ export const config = {
       },
     },
     {
+      day: 0,
       time: { en: "4:30 PM", fr: "16h30" },
       title: { en: "Cocktail", fr: "Cocktail" },
       icon: "glasses",
       venueIndex: 0,
     },
     {
+      day: 0,
       time: { en: "8:00 PM", fr: "20h00" },
       title: { en: "Wedding Reception", fr: "Réception" },
       icon: "dinner",
       venueIndex: 1,
       dressCode: { en: "Formal Evening Attire", fr: "Tenue de soirée" },
+    },
+    {
+      day: 1,
+      time: { en: "1:00 PM", fr: "13h00" },
+      title: { en: "Barbecue", fr: "Barbecue" },
+      icon: "grill",
+      venueIndex: 0,
+      dressCode: { en: "All white", fr: "Tout en blanc" },
+      icsStart: "2026-12-06T13:00:00-05:00",
     },
   ],
 
@@ -92,7 +127,7 @@ export const config = {
   // languages). Index here is what schedule[].venueIndex points at.
   venues: [
     {
-      heading: { en: "Ceremony & Cocktail", fr: "Cérémonie & Cocktail" },
+      heading: { en: "Ceremony, Cocktail & Barbecue", fr: "Cérémonie, cocktail et barbecue" },
       label: null,
       address: "11010 North Riding Rd, Upper Marlboro, MD 20772",
       mapsUrl: "https://www.google.com/maps/search/?api=1&query=11010+North+Riding+Rd+Upper+Marlboro+MD+20772",

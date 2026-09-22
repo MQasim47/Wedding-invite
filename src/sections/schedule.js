@@ -3,26 +3,28 @@ import { config } from "../config.js";
 import { t, getLang } from "../utils/store.js";
 import { icons } from "../utils/icons.js";
 
-// Builds a gentle S-curve SVG path spanning the events, so ScrollTrigger can
-// draw it via stroke-dashoffset while the events alternate left/right.
-function buildCurveSVG(count) {
+// Builds a gentle S-curve SVG path spanning the rows, so ScrollTrigger can
+// draw it via stroke-dashoffset while events alternate left/right. A day
+// heading passes straight through the centre of its segment (xOffset at the
+// midline) rather than getting its own bump, so it reads as a divider ON
+// the path instead of a break in the curve.
+function buildCurveSVG(sides) {
   const segmentHeight = 140;
-  const totalHeight = segmentHeight * count;
+  const totalHeight = segmentHeight * sides.length;
   const width = 200;
   let d = `M ${width / 2} 0`;
-  for (let i = 0; i < count; i++) {
+  sides.forEach((side, i) => {
     const y1 = segmentHeight * i + segmentHeight * 0.5;
     const y2 = segmentHeight * (i + 1);
-    const xOffset = i % 2 === 0 ? width * 0.8 : width * 0.2;
+    const xOffset = side === "left" ? width * 0.8 : side === "right" ? width * 0.2 : width / 2;
     d += ` Q ${xOffset} ${y1} ${width / 2} ${y2}`;
-  }
+  });
   return `<svg class="timeline-svg" viewBox="0 0 ${width} ${totalHeight}" preserveAspectRatio="none">
     <path class="timeline-path" d="${d}" />
   </svg>`;
 }
 
-function buildEvent(item, i) {
-  const side = i % 2 === 0 ? "left" : "right";
+function buildEvent(item, side) {
   const timeEl = el("p", { class: "timeline-event-time" });
   const titleEl = el("p", { class: "timeline-event-title" });
   const dressCodeEl = item.dressCode ? el("p", { class: "timeline-event-dresscode" }) : null;
@@ -36,11 +38,25 @@ function buildEvent(item, i) {
     noteEl,
   ]);
 
-  return { node, item, timeEl, titleEl, dressCodeEl, noteEl };
+  return { kind: "event", node, item, timeEl, titleEl, dressCodeEl, noteEl };
+}
+
+// A centered divider row between days — shares the `.timeline-event` class
+// (so it rides the same scroll-reveal animation and occupies one segment of
+// the curve) but data-side="center" keeps it out of the left/right
+// alternation and the curve running straight through its middle.
+function buildDayHeading(day) {
+  const headingEl = el("p", { class: "timeline-day-heading-text" });
+  const node = el("div", { class: "timeline-event timeline-day-heading", "data-side": "center" }, [headingEl]);
+  return { kind: "heading", node, day, headingEl };
 }
 
 function applyLang(entry) {
   const lang = getLang();
+  if (entry.kind === "heading") {
+    entry.headingEl.textContent = entry.day.heading[lang] || entry.day.heading.en;
+    return;
+  }
   const { item, timeEl, titleEl, dressCodeEl, noteEl } = entry;
   timeEl.textContent = item.time[lang] || item.time.en;
   titleEl.textContent = item.title[lang] || item.title.en;
@@ -48,12 +64,33 @@ function applyLang(entry) {
   if (noteEl) noteEl.textContent = item.note[lang] || item.note.en;
 }
 
-export function createScheduleSection() {
-  const entries = config.schedule.map(buildEvent);
-  entries.forEach(applyLang);
+// Groups config.schedule by `day` (an index into config.weddingDays),
+// inserting a heading row whenever the day changes. Events keep alternating
+// left/right in one continuous sequence across every day — only the actual
+// event rows advance the alternation, so a heading never shifts which side
+// the next event lands on.
+function buildRows() {
+  const rows = [];
+  let sideIndex = 0;
+  let lastDay = null;
+  config.schedule.forEach((item) => {
+    const dayIndex = item.day ?? 0;
+    if (dayIndex !== lastDay) {
+      rows.push(buildDayHeading(config.weddingDays[dayIndex]));
+      lastDay = dayIndex;
+    }
+    rows.push(buildEvent(item, sideIndex % 2 === 0 ? "left" : "right"));
+    sideIndex++;
+  });
+  return rows;
+}
 
-  const eventsWrap = el("div", { class: "timeline-events" }, entries.map((entry) => entry.node));
-  const svgWrap = fromHTML(buildCurveSVG(config.schedule.length));
+export function createScheduleSection() {
+  const rows = buildRows();
+  rows.forEach(applyLang);
+
+  const eventsWrap = el("div", { class: "timeline-events" }, rows.map((entry) => entry.node));
+  const svgWrap = fromHTML(buildCurveSVG(rows.map((entry) => entry.node.dataset.side)));
   const heart = el("div", { class: "timeline-heart", "aria-hidden": "true" }, [
     el("span", { html: icons.heartSolid }),
   ]);
@@ -67,7 +104,7 @@ export function createScheduleSection() {
 
   function updateLang() {
     sectionTitle.textContent = t().schedule.title;
-    entries.forEach(applyLang);
+    rows.forEach(applyLang);
   }
 
   return { node, updateLang };

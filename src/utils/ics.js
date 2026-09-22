@@ -24,12 +24,10 @@ function resolveEndDate(startISO) {
   return new Date(new Date(startISO).getTime() + 8 * 60 * 60 * 1000);
 }
 
-// Builds and downloads a .ics calendar file spanning the ceremony start
-// through the end of the reception, with every venue address included in
-// the description. DTSTART/DTEND are emitted in UTC (toICSDate), so the
-// event lands at the correct instant for a guest in any timezone.
-export function downloadICS() {
-  const lang = getLang();
+// One VEVENT block for the main ceremony-through-reception day, spanning
+// config.weddingDate through the end of that day, with every venue address
+// included in the description.
+function mainEvent(lang, stamp) {
   const start = new Date(config.weddingDate);
   const end = resolveEndDate(config.weddingDate);
 
@@ -50,13 +48,9 @@ export function downloadICS() {
   );
   const description = [bilingualSummary, ...bilingualAddressLines].join("\n");
 
-  const lines = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//Wedding Invitation//EN",
-    "CALSCALE:GREGORIAN",
+  return [
     "BEGIN:VEVENT",
-    `UID:${Date.now()}@wedding-invitation`,
+    `UID:${stamp}-0@wedding-invitation`,
     `DTSTAMP:${toICSDate(new Date())}`,
     `DTSTART:${toICSDate(start)}`,
     `DTEND:${toICSDate(end)}`,
@@ -64,6 +58,61 @@ export function downloadICS() {
     `LOCATION:${escapeICS(location)}`,
     `DESCRIPTION:${escapeICS(description)}`,
     "END:VEVENT",
+  ];
+}
+
+// One VEVENT per extra schedule item that opts in with its own `icsStart`
+// (see config.js — currently just the barbecue) — through end of that same
+// day, at its own venue, with its own dress code in the description. Any
+// future extra-day event gets a calendar entry automatically just by
+// setting icsStart, no code change here.
+function extraEvents(lang, stamp) {
+  return config.schedule
+    .filter((item) => item.icsStart)
+    .map((item, i) => {
+      const start = new Date(item.icsStart);
+      const end = resolveEndDate(item.icsStart);
+      const venue = config.venues[item.venueIndex];
+
+      const summary = `${config.couple.partner1} & ${config.couple.partner2} — ${resolveText(item.title, lang)}`;
+      const bilingualSummary = `${config.couple.partner1} & ${config.couple.partner2} — ${resolveText(item.title, "en")} / ${resolveText(item.title, "fr")}`;
+      const addressLine = `${resolveText(venue.heading, "en")} / ${resolveText(venue.heading, "fr")}: ${venue.address}`;
+      const description = [bilingualSummary, addressLine];
+      if (item.dressCode) {
+        description.push(`Dress code / Tenue: ${resolveText(item.dressCode, "en")} / ${resolveText(item.dressCode, "fr")}`);
+      }
+
+      return [
+        "BEGIN:VEVENT",
+        `UID:${stamp}-${i + 1}@wedding-invitation`,
+        `DTSTAMP:${toICSDate(new Date())}`,
+        `DTSTART:${toICSDate(start)}`,
+        `DTEND:${toICSDate(end)}`,
+        `SUMMARY:${escapeICS(summary)}`,
+        `LOCATION:${escapeICS(venue.address)}`,
+        `DESCRIPTION:${escapeICS(description.join("\n"))}`,
+        "END:VEVENT",
+      ];
+    })
+    .flat();
+}
+
+// Builds and downloads a .ics calendar file with one VEVENT per program day
+// (the main ceremony/cocktail/reception day, plus one per extra-day event
+// such as the barbecue), each with its own address and dress code. DTSTART/
+// DTEND are emitted in UTC (toICSDate), so every event lands at the correct
+// instant for a guest in any timezone.
+export function downloadICS() {
+  const lang = getLang();
+  const stamp = Date.now();
+
+  const lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Wedding Invitation//EN",
+    "CALSCALE:GREGORIAN",
+    ...mainEvent(lang, stamp),
+    ...extraEvents(lang, stamp),
     "END:VCALENDAR",
   ];
 

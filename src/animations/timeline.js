@@ -49,7 +49,8 @@ export function animateTimeline(sectionNode) {
   }
 
   events.forEach((event) => {
-    const fromX = event.dataset.side === "left" ? -40 : 40;
+    const side = event.dataset.side;
+    const fromX = side === "left" ? -40 : side === "right" ? 40 : 0;
     const iconShapes = event.querySelectorAll(".timeline-event-icon svg path, .timeline-event-icon svg circle");
     const drawableShapes = Array.from(iconShapes).filter((shape) => typeof shape.getTotalLength === "function");
 
@@ -64,7 +65,13 @@ export function animateTimeline(sectionNode) {
       toggleActions: "play none none reverse",
     };
 
-    gsap.fromTo(event, { opacity: 0, x: fromX }, { opacity: 1, x: 0, duration: 0.6, ease: "power2.out", scrollTrigger: trigger });
+    // A day heading (data-side="center") fades/scales in place — sliding it
+    // in sideways would read as another event rather than a divider.
+    if (side === "center") {
+      gsap.fromTo(event, { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power2.out", scrollTrigger: trigger });
+    } else {
+      gsap.fromTo(event, { opacity: 0, x: fromX }, { opacity: 1, x: 0, duration: 0.6, ease: "power2.out", scrollTrigger: trigger });
+    }
 
     if (drawableShapes.length) {
       gsap.to(drawableShapes, {
@@ -81,7 +88,7 @@ export function animateTimeline(sectionNode) {
   window.setTimeout(() => {
     events.forEach((event) => {
       if (parseFloat(getComputedStyle(event).opacity) < 1) {
-        gsap.set(event, { opacity: 1, x: 0 });
+        gsap.set(event, { opacity: 1, x: 0, scale: 1 });
         event.querySelectorAll(".timeline-event-icon svg path, .timeline-event-icon svg circle").forEach((shape) => {
           gsap.set(shape, { strokeDashoffset: 0 });
         });

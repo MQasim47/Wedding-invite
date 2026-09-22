@@ -24,7 +24,7 @@ export function createEnvelopeSection() {
     el(
       "button",
       { class: "envelope-seal-btn", type: "button", "aria-label": t().envelope.hint },
-      [fromHTML(waxSealSVG()), el("span", { class: "envelope-seal-initials" }, config.couple.initials)]
+      [fromHTML(waxSealSVG()), el("span", { class: "envelope-seal-initials notranslate", translate: "no" }, config.couple.initials)]
     ),
   ]);
 

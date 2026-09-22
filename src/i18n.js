@@ -11,9 +11,6 @@ export const i18n = {
     greeting: {
       dear: "Dear",
     },
-    welcome: {
-      heading: "Dear guests!",
-    },
     story: {
       title: "Our Story",
     },
@@ -98,9 +95,6 @@ export const i18n = {
     },
     greeting: {
       dear: "Cher/Chère",
-    },
-    welcome: {
-      heading: "Chers invités !",
     },
     story: {
       title: "NOTRE HISTOIRE",

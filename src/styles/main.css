@@ -723,7 +723,10 @@ svg { display: block; }
   position: relative;
   max-width: 320px;
   margin: 0 auto;
-  padding: 60px 32px 44px;
+  /* Top/bottom padding matched now that there's no heading reserving space
+     under the doily's arch (the client asked for it removed) — the welcome
+     text sits centered in the frame instead of pushed toward the bottom. */
+  padding: 44px 32px;
 }
 
 .welcome-doily-svg {
@@ -738,15 +741,6 @@ svg { display: block; }
 .welcome-frame-content {
   position: relative;
   z-index: 1;
-}
-
-.welcome-heading {
-  font-family: var(--font-script);
-  font-size: clamp(1.7rem, 7vw, 2.1rem);
-  /* --color-primary only clears ~3.3:1 on the doily/page background;
-     --color-primary-deep clears ~6.4:1. */
-  color: var(--color-primary-deep);
-  margin-bottom: 16px;
 }
 
 .welcome-text {

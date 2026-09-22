@@ -27,7 +27,7 @@ function buildMember(person, kind) {
 
   const photoWrap = el("div", { class: "party-photo-wrap" }, [fromHTML(ringSVG(isLead)), el("div", { class: "party-photo" }, [photoInner])]);
 
-  const nameEl = el("p", { class: "party-name" }, person.name);
+  const nameEl = el("p", { class: "party-name notranslate", translate: "no" }, person.name);
   const roleEl = el("p", { class: "party-role" }, person.role[getLang()] || person.role.en);
 
   const memberEl = el("div", { class: `party-member fade-up${isLead ? " party-member--lead" : ""}` }, [

@@ -30,13 +30,13 @@ function taglineText(lang) {
 export function createHeroSection() {
   const name1 = el(
     "span",
-    { class: "hero-name-1 name-reveal", style: "visibility: hidden;" },
+    { class: "hero-name-1 name-reveal notranslate", translate: "no", style: "visibility: hidden;" },
     config.couple.partner1
   );
   const amp = el("span", { class: "hero-ampersand" }, "&");
   const name2 = el(
     "span",
-    { class: "hero-name-2 name-reveal", style: "visibility: hidden;" },
+    { class: "hero-name-2 name-reveal notranslate", translate: "no", style: "visibility: hidden;" },
     config.couple.partner2
   );
 
@@ -82,7 +82,11 @@ export function createHeroSection() {
   ]);
 
   const node = el("section", { class: "section hero", id: "hero" }, [
-    el("h1", { class: "hero-names sr-only" }, `${config.couple.partner1} & ${config.couple.partner2}`),
+    el(
+      "h1",
+      { class: "hero-names sr-only notranslate", translate: "no" },
+      `${config.couple.partner1} & ${config.couple.partner2}`
+    ),
     illustration,
     hummingbird,
     el("div", { class: "hero-badge-wrap" }, [wisteria, pendant, callaLily]),

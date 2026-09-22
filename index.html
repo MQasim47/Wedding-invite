@@ -1,8 +1,17 @@
 <!doctype html>
-<html lang="en">
+<!--
+  translate="no" here, plus the <meta name="google" content="notranslate">
+  below, tell Chrome (and other browsers that honor it) never to offer
+  translation for this page at all. The site already has its own EN/FR
+  toggle (src/i18n.js) — browser auto-translation only breaks it: it has
+  mistranslated the groom's name, "Aimé" (a real French word meaning
+  "loved"), as "Love", and "se marient" as "get married".
+-->
+<html lang="en" translate="no">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="google" content="notranslate" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="theme-color" content="__THEME_COLOR__" />
 

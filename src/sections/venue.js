@@ -29,8 +29,8 @@ function buildVenueCard(venue, index) {
   const lang = getLang();
 
   const labelEl = venue.label ? el("p", { class: "venue-label" }, resolveText(venue.label, lang)) : null;
-  const headingEl = el("h3", { class: "venue-name" }, resolveText(venue.heading, lang));
-  const addressEl = el("p", { class: "venue-address" }, venue.address);
+  const headingEl = el("h3", { class: "venue-name notranslate", translate: "no" }, resolveText(venue.heading, lang));
+  const addressEl = el("p", { class: "venue-address notranslate", translate: "no" }, venue.address);
   const dressCodes = dressCodesFor(index, lang);
   const dressCodeEl = el("p", { class: "venue-dresscode" }, dressCodes.join(" · "));
   dressCodeEl.hidden = dressCodes.length === 0;

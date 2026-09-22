@@ -71,7 +71,7 @@ function crestSymbol(initials) {
       <path class="d-emblem-shade" transform="translate(1 1.3)" d="${emblem}"/>
       <path class="d-emblem-fill" pathLength="1" d="${emblem}"/>
     </g>
-    <text class="d-initials" x="${cx}" y="${cy + 37}" text-anchor="middle">${initials.replace(/&/g, "&amp;")}</text>
+    <text class="d-initials notranslate" translate="no" x="${cx}" y="${cy + 37}" text-anchor="middle">${initials.replace(/&/g, "&amp;")}</text>
   </symbol>`;
 }
 

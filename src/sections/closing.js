@@ -7,9 +7,9 @@ export function createClosingSection() {
   const watermark = el("div", { class: "closing-watermark", "aria-hidden": "true" }, t().closing.withLove);
   const withLoveEl = el("p", { class: "closing-with-love" }, t().closing.withLove);
 
-  const name1 = el("span", { class: "closing-name" }, config.couple.partner1);
+  const name1 = el("span", { class: "closing-name notranslate", translate: "no" }, config.couple.partner1);
   const amp = el("span", { class: "closing-amp" }, "&");
-  const name2 = el("span", { class: "closing-name" }, config.couple.partner2);
+  const name2 = el("span", { class: "closing-name notranslate", translate: "no" }, config.couple.partner2);
   const namesWrap = el("div", { class: "closing-names" }, [name1, amp, name2]);
 
   const sealEl = el("div", { class: "closing-seal" }, [fromHTML(waxSealHeartSVG())]);

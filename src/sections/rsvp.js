@@ -117,7 +117,7 @@ export function createRsvpSection() {
 
   // Decorative background typography only — stays the literal word "RSVP"
   // regardless of language (see NOTES.md Batch 4), not sourced from t().
-  const watermark = el("div", { class: "rsvp-watermark", "aria-hidden": "true" }, "RSVP");
+  const watermark = el("div", { class: "rsvp-watermark notranslate", "aria-hidden": "true", translate: "no" }, "RSVP");
 
   const node = el("section", { class: "section rsvp-section", id: "rsvp" }, [
     watermark,

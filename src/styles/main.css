@@ -663,7 +663,10 @@ svg { display: block; }
 }
 
 .hero-ampersand {
-  color: var(--color-accent);
+  /* Matches sibling .hero-names: --color-accent (gold) on the badge's
+     --color-primary-deep plate only clears ~2.7:1 — --color-background
+     (cream) clears ~6.4:1. */
+  color: var(--color-background);
   display: block;
   font-size: 0.6em;
   margin: 4px 0;
@@ -681,7 +684,9 @@ svg { display: block; }
   text-transform: uppercase;
 }
 
-.hero-badge-date-divider { color: rgba(255, 255, 255, 0.45); font-size: 0.75rem; }
+/* A purely decorative "|" between the day/month/year parts — 0.45 alpha
+   only cleared ~2.6:1 against the badge; 0.82 clears ~4.9:1. */
+.hero-badge-date-divider { color: rgba(255, 255, 255, 0.82); font-size: 0.75rem; }
 .hero-badge-date-day { font-weight: 700; font-size: 1.15rem; letter-spacing: 0; }
 
 .hero-tagline {
@@ -703,7 +708,11 @@ svg { display: block; }
   text-align: center;
   font-family: var(--font-script);
   font-size: 1.8rem;
-  color: var(--color-primary);
+  /* Same fix as .welcome-heading below: --color-primary is too close to
+     the 3:1 large-text minimum to survive the watermark/grain layer's
+     occasional darker pixel; --color-primary-deep keeps real margin. Only
+     renders with ?guest=, so the decor contrast check never sampled it. */
+  color: var(--color-primary-deep);
   margin-bottom: 8px;
 }
 
@@ -734,7 +743,9 @@ svg { display: block; }
 .welcome-heading {
   font-family: var(--font-script);
   font-size: clamp(1.7rem, 7vw, 2.1rem);
-  color: var(--color-primary);
+  /* --color-primary only clears ~3.3:1 on the doily/page background;
+     --color-primary-deep clears ~6.4:1. */
+  color: var(--color-primary-deep);
   margin-bottom: 16px;
 }
 
@@ -1229,9 +1240,14 @@ svg { display: block; }
   height: 78px;
   border-radius: 50%;
   border: 1.5px solid var(--color-primary);
-  /* Deep, not bright — the small uppercase .countdown-label inherits this
-     and needs 4.5:1; the ring border above stays the brighter --color-primary. */
-  color: var(--color-primary-deep);
+  /* --color-text (darkest token), not --color-primary-deep — the digits sit
+     right over the watermark/paper-grain layer (see decor.js), whose fractal
+     noise occasionally spikes a pixel dark enough to eat primaryDeep's
+     margin at this size (measured intermittently ~2.9:1, just under the 3:1
+     large-text minimum); --color-text keeps a comfortable margin regardless.
+     The small uppercase .countdown-label inherits this too; the ring border
+     above stays the brighter --color-primary. */
+  color: var(--color-text);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1566,7 +1582,9 @@ svg { display: block; }
 .closing-amp {
   font-family: var(--font-script);
   font-size: clamp(1.3rem, 6vw, 1.7rem);
-  color: var(--color-accent);
+  /* --color-accent only clears ~2.4:1 on the page background;
+     --color-primary-deep clears ~6.4:1. */
+  color: var(--color-primary-deep);
 }
 
 .closing-heart-row {
@@ -1750,12 +1768,16 @@ section.section > .decor-corner--br { bottom: 4px; right: 4px; transform: rotate
 .decor-paper .welcome-doily-svg { filter: drop-shadow(0 12px 26px rgba(0, 0, 0, 0.1)) drop-shadow(0 1px 0 rgba(255, 255, 255, 0.9)); }
 
 /* Contrast guard. The paper grain and watermark cost the darkest background
-   pixel ~5% of luminance, and two pieces of text had under 4% of headroom over
-   4.5:1 to start with (measured with scripts/decor-check.mjs contrast): the 11px
-   count-down labels (drawn at 85% opacity) and the browser-default placeholder.
-   Both are firmed up only while the decoration is live. */
+   pixel ~5% of luminance, and the 11px count-down labels (drawn at 85%
+   opacity) had under 4% of headroom over 4.5:1 to start with (measured with
+   scripts/decor-check.mjs contrast) — firmed up only while the decoration
+   is live, since that's the only time it's at risk. */
 .decor-live .countdown-label { opacity: 1; }
-.decor-live ::placeholder { color: color-mix(in srgb, var(--color-text) 72%, var(--color-background)); opacity: 1; }
+
+/* The browser-default placeholder (~4.1:1 at best) fails 4.5:1 even with
+   decor off, so this is unconditional — 80% clears it with margin to spare
+   regardless of what's behind the field. */
+::placeholder { color: color-mix(in srgb, var(--color-text) 80%, var(--color-background)); opacity: 1; }
 
 @media (prefers-reduced-motion: reduce) {
   /* Flourishes and the crest simply appear: no stroke or fade animation. */

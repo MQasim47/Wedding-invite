@@ -206,7 +206,15 @@ try {
       document.querySelectorAll("input[placeholder],textarea[placeholder]").forEach((inp) => {
         const r = inp.getBoundingClientRect();
         if (r.width < 2) return;
-        add(inp, inp.placeholder, [r], getComputedStyle(inp), getComputedStyle(inp, "::placeholder").color);
+        // A resizable <textarea>'s native resize-handle glyph (bottom-right,
+        // ~16px, UA-drawn — CSS "color" can't touch it, so it survives the
+        // transparency repaint below and would get sampled as "background",
+        // producing a false worst-case pixel nowhere near the actual text.
+        const resizable = inp.tagName === "TEXTAREA" && getComputedStyle(inp).resize !== "none";
+        const rect = resizable
+          ? { left: r.left, top: r.top, width: r.width, height: Math.max(20, r.height - 16) }
+          : r;
+        add(inp, inp.placeholder, [rect], getComputedStyle(inp), getComputedStyle(inp, "::placeholder").color);
       });
       return runs;
     });
@@ -223,9 +231,18 @@ try {
     const runs = await collectTextRuns(page);
     // Repaint with every glyph transparent: what remains under each run is the
     // real background — page colour, watermark, grain, frames, decoration.
+    // One restore is needed after the blanket rule: this codebase's icons use
+    // fill="currentColor", which also reads the "color" property, so the
+    // blanket rule doesn't just hide text — it also wipes any decorative
+    // shape's own fill. Most icons sit beside text, so that's harmless, but
+    // the calendar's heart icon sits BEHIND its day number, so wiping it
+    // corrupts the "background" sampled for that number (a class selector +
+    // !important beats the universal one on specificity, restoring it before
+    // the screenshot). Actual in-SVG text (the crest's initials) is still
+    // hidden via the dedicated svg text rule below.
     await page.addStyleTag({
       content:
-        "*{color:transparent!important;-webkit-text-fill-color:transparent!important;text-shadow:none!important}::placeholder{color:transparent!important;-webkit-text-fill-color:transparent!important}svg text{fill:transparent!important}.companion,.floating-controls{visibility:hidden!important}",
+        "*{color:transparent!important;-webkit-text-fill-color:transparent!important;text-shadow:none!important}::placeholder{color:transparent!important;-webkit-text-fill-color:transparent!important}svg text{fill:transparent!important}.calendar-day-heart-icon,.calendar-day-heart-icon *{color:var(--color-primary-deep)!important}.companion,.floating-controls{visibility:hidden!important}",
     });
     await page.waitForTimeout(300);
     const shot = await page.screenshot({ fullPage: true });
@@ -240,10 +257,23 @@ try {
       const fgc = [run.color.r, run.color.g, run.color.b];
       let worst = Infinity;
       for (const r of run.rects) {
-        const x0 = Math.max(0, Math.floor(r.x));
-        const x1 = Math.min(W - 1, Math.ceil(r.x + r.w));
-        const y0 = Math.max(0, Math.floor(r.y));
-        const y1 = Math.min(H - 1, Math.ceil(r.y + r.h));
+        // A 2px inward inset: right at a rect's edge, the grid can land on a
+        // 1px antialiased seam (e.g. the curved boundary of a small icon
+        // sitting behind a number, like the calendar's heart) which isn't
+        // where the glyph's own ink actually sits — sampling it as
+        // "background" produces a worst-case ratio nothing on screen shows.
+        // Collapses to the rect's center instead of skipping it outright
+        // when the rect is too small for the inset to leave a valid range.
+        let x0 = Math.floor(r.x + 2);
+        let x1 = Math.ceil(r.x + r.w - 2);
+        let y0 = Math.floor(r.y + 2);
+        let y1 = Math.ceil(r.y + r.h - 2);
+        if (x1 < x0) x0 = x1 = Math.round(r.x + r.w / 2);
+        if (y1 < y0) y0 = y1 = Math.round(r.y + r.h / 2);
+        x0 = Math.max(0, x0);
+        x1 = Math.min(W - 1, x1);
+        y0 = Math.max(0, y0);
+        y1 = Math.min(H - 1, y1);
         for (let y = y0; y <= y1; y += 2) {
           for (let x = x0; x <= x1; x += 2) {
             const i = (y * W + x) * 3;

@@ -1116,11 +1116,56 @@ svg { display: block; }
   margin-top: 2px;
 }
 
+/* Dress code — solid body-text colour, upright (no faint italic), so every
+   line clears 4.5:1 on the cream background. */
 .timeline-event-dresscode {
+  margin-top: 8px;
+  color: var(--color-text);
+  /* The event column is 56% wide, so its inner edge reaches past the
+     timeline's midline, where the curve passes; these longer lines stop
+     short of it instead of running across the stroke. */
+  max-width: 86%;
+}
+.timeline-event[data-side="right"] .timeline-event-dresscode { margin-left: auto; }
+
+.timeline-event-dresscode-heading {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-primary-deep);
+}
+
+.timeline-event-dresscode-style {
   font-size: 0.95rem;
-  color: var(--color-label);
-  margin-top: 6px;
-  font-style: italic;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.timeline-event-dresscode-detail {
+  font-size: 1rem;
+  margin-top: 2px;
+}
+
+.dresscode-segment { display: block; }
+.dresscode-nowrap { white-space: nowrap; }
+
+/* Guest outfit colours (config.schedule[].dressCode.swatches) — not theme
+   tokens. The ring keeps the pale pink visible against the cream page. */
+.dresscode-swatches {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 6px;
+  vertical-align: -1px;
+}
+
+.dresscode-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-text) 45%, transparent);
 }
 
 .timeline-event-note {

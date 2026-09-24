@@ -10,13 +10,15 @@ function resolveText(value, lang) {
 }
 
 // Rolls up dress codes from every schedule item held at this venue index,
-// deduplicated, so a card only shows each distinct dress code once.
+// deduplicated, so a card only shows each distinct dress code once. A
+// structured dress code contributes just its `style` line here — the full
+// block (heading, colours) lives on the timeline.
 function dressCodesFor(venueIndex, lang) {
   const seen = new Set();
   const codes = [];
   config.schedule.forEach((item) => {
     if (item.venueIndex !== venueIndex || !item.dressCode) return;
-    const text = resolveText(item.dressCode, lang);
+    const text = resolveText(item.dressCode.style ?? item.dressCode, lang);
     if (!seen.has(text)) {
       seen.add(text);
       codes.push(text);

@@ -24,21 +24,67 @@ function buildCurveSVG(sides) {
   </svg>`;
 }
 
+// A dress code is either plain bilingual text (one line) or a structured
+// { heading, style, detail, swatches? } block — see config.schedule.
+function buildDressCode(dressCode) {
+  if (!dressCode) return { node: null, parts: {} };
+  const detail = el("p", { class: "timeline-event-dresscode-detail" });
+  if (!dressCode.style) {
+    return { node: el("div", { class: "timeline-event-dresscode" }, [detail]), parts: { detail } };
+  }
+  const parts = {
+    heading: el("p", { class: "timeline-event-dresscode-heading" }),
+    style: el("p", { class: "timeline-event-dresscode-style" }),
+    detail,
+  };
+  return {
+    node: el("div", { class: "timeline-event-dresscode" }, [parts.heading, parts.style, detail]),
+    parts,
+  };
+}
+
+// Each " · " segment of the detail gets its own line (the column is too
+// narrow to wrap one long line gracefully), followed by that segment's
+// colour dots. The dots ride in a no-wrap span with the segment's last word
+// so they never end up alone on a line. The dots are aria-hidden — the words
+// already name each colour — and the dropped " · " is kept for screen readers.
+function renderDetail(detailEl, text, swatches) {
+  const segments = text.split(" · ");
+  detailEl.replaceChildren(
+    ...segments.map((segment, i) => {
+      const lead = i > 0 ? el("span", { class: "sr-only" }, " · ") : null;
+      const colors = swatches?.[i];
+      if (!colors?.length) return el("span", { class: "dresscode-segment" }, [lead, segment]);
+      const cut = segment.lastIndexOf(" ") + 1;
+      const dots = el(
+        "span",
+        { class: "dresscode-swatches", "aria-hidden": "true" },
+        colors.map((color) => el("span", { class: "dresscode-swatch", style: `background:${color}` }))
+      );
+      return el("span", { class: "dresscode-segment" }, [
+        lead,
+        segment.slice(0, cut),
+        el("span", { class: "dresscode-nowrap" }, [segment.slice(cut), dots]),
+      ]);
+    })
+  );
+}
+
 function buildEvent(item, side) {
   const timeEl = el("p", { class: "timeline-event-time" });
   const titleEl = el("p", { class: "timeline-event-title" });
-  const dressCodeEl = item.dressCode ? el("p", { class: "timeline-event-dresscode" }) : null;
+  const dressCode = buildDressCode(item.dressCode);
   const noteEl = item.note ? el("p", { class: "timeline-event-note" }) : null;
 
   const node = el("div", { class: "timeline-event", "data-side": side }, [
     el("span", { class: "timeline-event-icon", html: icons[item.icon] || icons.heart }),
     timeEl,
     titleEl,
-    dressCodeEl,
+    dressCode.node,
     noteEl,
   ]);
 
-  return { kind: "event", node, item, timeEl, titleEl, dressCodeEl, noteEl };
+  return { kind: "event", node, item, timeEl, titleEl, dressCodeParts: dressCode.parts, noteEl };
 }
 
 // A centered divider row between days — shares the `.timeline-event` class
@@ -57,10 +103,16 @@ function applyLang(entry) {
     entry.headingEl.textContent = entry.day.heading[lang] || entry.day.heading.en;
     return;
   }
-  const { item, timeEl, titleEl, dressCodeEl, noteEl } = entry;
+  const { item, timeEl, titleEl, dressCodeParts, noteEl } = entry;
   timeEl.textContent = item.time[lang] || item.time.en;
   titleEl.textContent = item.title[lang] || item.title.en;
-  if (dressCodeEl) dressCodeEl.textContent = item.dressCode[lang] || item.dressCode.en;
+  const code = item.dressCode;
+  if (code && !code.style) dressCodeParts.detail.textContent = code[lang] || code.en;
+  else if (code) {
+    dressCodeParts.heading.textContent = code.heading[lang] || code.heading.en;
+    dressCodeParts.style.textContent = code.style[lang] || code.style.en;
+    renderDetail(dressCodeParts.detail, code.detail[lang] || code.detail.en, code.swatches);
+  }
   if (noteEl) noteEl.textContent = item.note[lang] || item.note.en;
 }
 

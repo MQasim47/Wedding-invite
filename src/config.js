@@ -60,7 +60,9 @@ export const config = {
   // Each item can carry its own venue (via venueIndex, into the venues array
   // below), dress code, and an optional extra note — all shown in the
   // timeline, and dress codes are also rolled up under the matching venue
-  // card in the Venue section.
+  // card in the Venue section. A dress code is either plain bilingual text,
+  // or { heading, style, detail, swatches? } for the fuller timeline block
+  // (the venue card shows just its `style`).
   // The program's days, in order. The schedule section groups schedule[].day
   // (an index into this array) under these headings on the timeline, and the
   // calendar highlights every date listed here (the first, full-size; the
@@ -91,7 +93,19 @@ export const config = {
       title: { en: "Wedding Ceremony", fr: "Cérémonie de mariage" },
       icon: "rings",
       venueIndex: 0,
-      dressCode: { en: "Elegant Daytime Attire", fr: "Tenue de jour élégante" },
+      dressCode: {
+        heading: { en: "Daytime", fr: "Journée" },
+        style: { en: "Glamorous & Sophisticated", fr: "Glamour & raffiné" },
+        detail: {
+          en: "Gentlemen: Black · Ladies: Pink or Green",
+          fr: "Messieurs : noir · Mesdames : rose ou vert",
+        },
+        // The guests' outfit colours, one list per " · " segment of `detail`
+        // (gentlemen, then ladies), shown as small dots after that segment —
+        // deliberately not theme tokens (green appears nowhere else on the
+        // site), so changing the palette never changes what guests wear.
+        swatches: [["#111111"], ["#F2A0BE", "#2E7D4F"]],
+      },
       note: {
         en: "Ladies: English-style hats encouraged",
         fr: "Mesdames : chapeaux à l'anglaise bienvenus",
@@ -110,7 +124,14 @@ export const config = {
       title: { en: "Wedding Reception", fr: "Réception" },
       icon: "dinner",
       venueIndex: 1,
-      dressCode: { en: "Formal Evening Attire", fr: "Tenue de soirée" },
+      dressCode: {
+        heading: { en: "Evening", fr: "Soirée" },
+        style: { en: "Chic & Elegant", fr: "Chic & élégant" },
+        detail: {
+          en: "Dress to impress for an elegant evening celebration.",
+          fr: "Habillez-vous avec élégance pour une soirée de fête.",
+        },
+      },
     },
     {
       day: 1,

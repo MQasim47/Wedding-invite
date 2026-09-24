@@ -1,3 +1,5 @@
+> **SUPERSEDED — kept for reference only.** The site now sends RSVPs to the guest-system Supabase database, not this Google Sheet. See [README.md](./README.md).
+
 # RSVP Backend Setup (Google Sheets + Apps Script)
 
 This connects the RSVP form to a Google Sheet, with no server to host or pay for.

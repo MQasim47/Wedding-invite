@@ -1585,6 +1585,51 @@ svg { display: block; }
   color: var(--color-primary);
 }
 
+/* Personal invitation codes (?i=) — the name the reply is for, the guest's
+   current answer, their seat limit, and the quiet notice that replaces the
+   form without a valid code. */
+.rsvp-for { text-align: center; }
+.rsvp-guest-name {
+  font-family: var(--font-script);
+  font-size: 1.7rem;
+  line-height: 1.25;
+  color: var(--color-primary-deep);
+  overflow-wrap: anywhere;
+}
+.rsvp-previous {
+  margin-top: 8px;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--color-label);
+}
+.rsvp-guests-note {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--color-label);
+  text-align: center;
+}
+.rsvp-guest-name + .rsvp-previous { margin-top: 4px; }
+
+.rsvp-notice {
+  text-align: center;
+  padding: 8px 0 4px;
+}
+.rsvp-notice-text {
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--color-text);
+}
+.rsvp-notice-note {
+  margin-top: 12px;
+  font-size: 0.88rem;
+  font-style: italic;
+  line-height: 1.45;
+  color: var(--color-label);
+}
+.rsvp-retry-btn,
+.rsvp-change-btn { margin-top: 18px; }
+
 /* ---------------------------------------------------------------------- */
 /* Extras                                                                  */
 /* ---------------------------------------------------------------------- */

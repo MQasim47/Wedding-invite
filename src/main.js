@@ -2,7 +2,8 @@ import "./styles/main.css";
 
 import gsap from "gsap";
 import { config } from "./config.js";
-import { onLangChange } from "./utils/store.js";
+import { onLangChange, applyPreferredLanguage } from "./utils/store.js";
+import { loadInvitation, onInvitationChange } from "./utils/invitation.js";
 import { applyTheme } from "./animations/theme.js";
 import { initSmoothScroll } from "./animations/smoothScroll.js";
 import { idlePulse, playOpenSequence } from "./animations/envelope.js";
@@ -110,6 +111,16 @@ onLangChange(() => {
   langUpdaters.forEach((fn) => fn());
 });
 
+// --- Personal invitation (?i=<code>) --------------------------------------
+// Looked up once, in parallel with the envelope animation — by the time the
+// seal is tapped the greeting and RSVP form are almost always ready. The
+// invitation's preferred language overrides the browser guess (never a
+// language the guest picked with the toggle).
+onInvitationChange((state) => {
+  if (state.status === "found") applyPreferredLanguage(state.invitation.preferredLanguage);
+});
+loadInvitation();
+
 // --- Audio -----------------------------------------------------------
 // Plays the configured playlist in order (track 1, then track 2, ...) and
 // loops back to the start — a single <audio> element with its src swapped
@@ -158,8 +169,9 @@ if (audioAvailable) {
 }
 
 // --- Envelope gate -----------------------------------------------------
-const { node: envelopeNode, sealBtn, flap, sealEl, glowEl, sparkleCanvas, flashEl, hintEl, disconnect } = createEnvelopeSection();
+const { node: envelopeNode, sealBtn, flap, sealEl, glowEl, sparkleCanvas, flashEl, hintEl, disconnect, updateLang: updateEnvelopeLang } = createEnvelopeSection();
 const pulseTween = idlePulse(sealBtn);
+langUpdaters.push(updateEnvelopeLang);
 
 sealBtn.addEventListener(
   "click",

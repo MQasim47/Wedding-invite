@@ -8,6 +8,9 @@ export const i18n = {
     envelope: {
       hint: "(tap to open)",
     },
+    // "Dear {name}," — names are often partial or descriptive ("Voisin
+    // blanc", "Chorale 4"), so the salutation must read naturally in front
+    // of any of them.
     greeting: {
       dear: "Dear",
     },
@@ -50,8 +53,7 @@ export const i18n = {
       title: "RSVP",
       heading: "RSVP",
       deadlinePrefix: "Kindly confirm your attendance by",
-      name: "Full Name",
-      namePlaceholder: "Your full name",
+      respondingFor: "Replying for",
       attending: "Will you attend?",
       attendingYes: "Joyfully Accepts",
       attendingNo: "Regretfully Declines",
@@ -66,11 +68,32 @@ export const i18n = {
       errorGeneric: "Something went wrong. Please try again.",
       errorNetwork: "We couldn't reach the server. Please check your connection and try again.",
       errorServer: "Something went wrong on our side, and your RSVP was not saved. Please try again in a moment.",
-      errorTimeout: "This is taking longer than expected, so we stopped waiting. Please try again — you won't be counted twice.",
-      errorName: "Please enter your name.",
+      errorTimeout: "This is taking longer than expected, so we stopped waiting. Please try again — your reply is only ever saved once.",
+      errorRateLimited: "Too many attempts from this connection. Please wait a minute and try again.",
+      errorInvalidCode: "We couldn't find your invitation. Please open the full personal link you were sent and try again.",
+      errorGuestCount: "That number of guests isn't available on this invitation.",
       errorAttending: "Please select an option.",
       closedTitle: "RSVP Closed",
       closedMessage: "Thank you for your interest — the RSVP deadline has passed. Please reach out to the couple directly if you'd like to let them know.",
+      // Invitation codes (?i=). No code, or one that can't be found, still
+      // shows the whole invitation — only the form is replaced.
+      loading: "Loading your invitation…",
+      noCode: "To reply, please use the personal link you received with your invitation.",
+      incompleteLink: "This link may be incomplete — please check that you opened the full link you were sent.",
+      lookupError: "We couldn't load your reply form just now. Please check your connection and try again.",
+      retry: "Try again",
+      // {guests} is filled with a count and guestUnit, e.g. "2 guests".
+      previousAccepted: "Your current reply: attending, {guests}. You can change it below.",
+      previousDeclined: "Your current reply: not attending. You can change it below.",
+      closedAccepted: "Your reply: attending, {guests}.",
+      closedDeclined: "Your reply: not attending.",
+      guestsLimit: "Up to {guests} on this invitation.",
+      guestsSingle: "This invitation is for 1 guest.",
+      guestsUnconfirmed: "The number of seats on this invitation is still being confirmed, so for now you can reply for 1 guest.",
+      guestUnit: ["guest", "guests"],
+      submitUpdate: "Update my reply",
+      successUpdated: "Your reply has been updated.",
+      changeReply: "Change my reply",
     },
     extras: {
       galleryTitle: "Gallery",
@@ -96,8 +119,11 @@ export const i18n = {
     envelope: {
       hint: "(appuyez pour ouvrir)",
     },
+    // Gender-neutral on purpose: "Cher/Chère" can't be agreed with names
+    // like "Chorale 4" or "fille Nadège". "Bonjour {name}," reads naturally
+    // in front of any of them.
     greeting: {
-      dear: "Cher/Chère",
+      dear: "Bonjour",
     },
     story: {
       title: "NOTRE HISTOIRE",
@@ -138,8 +164,7 @@ export const i18n = {
       title: "RSVP",
       heading: "Confirmez votre présence",
       deadlinePrefix: "Merci de confirmer votre présence avant le",
-      name: "NOM ET PRÉNOM",
-      namePlaceholder: "Votre nom et prénom",
+      respondingFor: "Réponse pour",
       attending: "SEREZ-VOUS PRÉSENT(E) ?",
       attendingYes: "J'accepte avec joie",
       attendingNo: "Je décline à regret",
@@ -154,11 +179,29 @@ export const i18n = {
       errorGeneric: "Une erreur est survenue. Veuillez réessayer.",
       errorNetwork: "Impossible de joindre le serveur. Vérifiez votre connexion et réessayez.",
       errorServer: "Une erreur est survenue de notre côté et votre réponse n'a pas été enregistrée. Veuillez réessayer dans un instant.",
-      errorTimeout: "L'envoi prend plus de temps que prévu, nous avons donc arrêté d'attendre. Veuillez réessayer — vous ne serez pas compté(e) deux fois.",
-      errorName: "Veuillez saisir votre nom.",
+      errorTimeout: "L'envoi prend plus de temps que prévu, nous avons donc arrêté d'attendre. Veuillez réessayer — votre réponse n'est jamais enregistrée deux fois.",
+      errorRateLimited: "Trop de tentatives depuis cette connexion. Merci de patienter une minute avant de réessayer.",
+      errorInvalidCode: "Nous n'avons pas trouvé votre invitation. Ouvrez le lien personnel complet que vous avez reçu, puis réessayez.",
+      errorGuestCount: "Ce nombre de personnes n'est pas disponible pour cette invitation.",
       errorAttending: "Veuillez choisir une option.",
       closedTitle: "RSVP clos",
       closedMessage: "Merci de votre intérêt — la date limite de confirmation est dépassée. N'hésitez pas à contacter directement les mariés.",
+      loading: "Chargement de votre invitation…",
+      noCode: "Pour répondre, merci d'utiliser le lien personnel reçu avec votre invitation.",
+      incompleteLink: "Ce lien est peut-être incomplet — vérifiez que vous avez bien ouvert le lien complet qui vous a été envoyé.",
+      lookupError: "Impossible de charger le formulaire de réponse pour le moment. Vérifiez votre connexion et réessayez.",
+      retry: "Réessayer",
+      previousAccepted: "Votre réponse actuelle : présent(e), {guests}. Vous pouvez la modifier ci-dessous.",
+      previousDeclined: "Votre réponse actuelle : absent(e). Vous pouvez la modifier ci-dessous.",
+      closedAccepted: "Votre réponse : présent(e), {guests}.",
+      closedDeclined: "Votre réponse : absent(e).",
+      guestsLimit: "Jusqu'à {guests} pour cette invitation.",
+      guestsSingle: "Cette invitation est valable pour 1 personne.",
+      guestsUnconfirmed: "Le nombre de places de cette invitation est en cours de confirmation ; pour l'instant, vous pouvez répondre pour 1 personne.",
+      guestUnit: ["personne", "personnes"],
+      submitUpdate: "Mettre à jour ma réponse",
+      successUpdated: "Votre réponse a bien été mise à jour.",
+      changeReply: "Modifier ma réponse",
     },
     extras: {
       galleryTitle: "GALERIE",
@@ -183,22 +226,31 @@ export const i18n = {
 
 const LANG_STORAGE_KEY = "wedding-lang";
 
+// The language the guest explicitly toggled to on an earlier visit, if any.
+// Only the manual toggle ever writes this (see persistLanguage).
+export function getStoredLanguage() {
+  try {
+    const stored = localStorage.getItem(LANG_STORAGE_KEY);
+    if (stored === "en" || stored === "fr") return stored;
+  } catch {
+    // localStorage unavailable (private mode, disabled storage, etc.)
+  }
+  return null;
+}
+
 // Resolves the starting language. A fixed "en"/"fr" config always wins. For
 // "bilingual", a language the guest previously toggled to (remembered in
 // localStorage) wins; otherwise it's detected from the browser, defaulting
-// to French only when navigator.language starts with "fr".
+// to French only when navigator.language starts with "fr". An invitation's
+// preferred_language, once looked up, overrides the browser guess but never
+// a manual choice (see applyPreferredLanguage in utils/store.js).
 export function resolveInitialLanguage(configLanguage) {
   if (configLanguage !== "bilingual") {
     return configLanguage === "fr" ? "fr" : "en";
   }
 
-  try {
-    const stored = localStorage.getItem(LANG_STORAGE_KEY);
-    if (stored === "en" || stored === "fr") return stored;
-  } catch {
-    // localStorage unavailable (private mode, disabled storage, etc.) — fall
-    // through to browser-language detection.
-  }
+  const stored = getStoredLanguage();
+  if (stored) return stored;
 
   const navLang = typeof navigator !== "undefined" ? navigator.language || "" : "";
   return navLang.toLowerCase().startsWith("fr") ? "fr" : "en";

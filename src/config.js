@@ -227,11 +227,14 @@ export const config = {
     tracks: ["/audio/song-1.mp3", "/audio/song-2.mp3"],
   },
 
+  // Replies go to the guest-system's Supabase database, keyed by each
+  // guest's personal invitation code (?i=<code>). The deadline and each
+  // invitation's guest limit live there too (settings.rsvp_deadline and
+  // invitations.authorized_guests), so the client changes them from the
+  // dashboard — not here. Connection details: VITE_SUPABASE_URL and
+  // VITE_SUPABASE_ANON_KEY (see .env.example).
   rsvp: {
     enabled: true,
-    deadline: "2026-10-15",
-    endpoint: "https://script.google.com/macros/s/AKfycbyoL0oC15rW83VMn_9UMy5jA427hdZLA8R95VuEq4Dab6LwTzI-R4GfTPD0J5vIASGa/exec", // Google Apps Script web app URL (rsvp-backend/SETUP.md). Required: while empty, submitting the form shows an error — there is no demo mode
-    maxGuests: 6,
   },
 
   extras: {

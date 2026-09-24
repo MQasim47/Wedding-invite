@@ -2,13 +2,22 @@ import gsap from "gsap";
 import { el } from "../utils/dom.js";
 import { config } from "../config.js";
 import { t, getLang } from "../utils/store.js";
-import { getGuestName } from "../utils/guestParam.js";
 import { icons } from "../utils/icons.js";
+import { rpc } from "../utils/supabase.js";
+import {
+  getInvitationCode,
+  getInvitationState,
+  onInvitationChange,
+  loadInvitation,
+  loadRsvpDeadline,
+  updateInvitationRsvp,
+} from "../utils/invitation.js";
+import { refreshScrollTriggers } from "../animations/scrollReveal.js";
 
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-function formatDeadline(lang) {
-  const date = new Date(`${config.rsvp.deadline}T00:00:00`);
+function formatDeadline(deadline, lang) {
+  const date = new Date(`${deadline}T00:00:00`);
   return new Intl.DateTimeFormat(lang === "fr" ? "fr-FR" : "en-US", {
     day: "numeric",
     month: "long",
@@ -16,112 +25,83 @@ function formatDeadline(lang) {
   }).format(date);
 }
 
-// Guests can still RSVP through the whole calendar day of the deadline.
-function isDeadlinePassed() {
-  return Date.now() > new Date(`${config.rsvp.deadline}T23:59:59`).getTime();
+// Guests can still RSVP through the whole calendar day of the deadline, in
+// their own time zone. (The server closes at the end of that day anywhere on
+// earth, so it never refuses a reply this still allows.)
+function isDeadlinePassed(deadline) {
+  return !!deadline && Date.now() > new Date(`${deadline}T23:59:59`).getTime();
 }
 
-// Apps Script cold starts can take several seconds, so a slow response is
-// normal — tell the guest we're still working after SLOW_AFTER_MS, and give up
-// (with a retryable error) only after TIMEOUT_MS.
+// "1 guest" / "2 guests" / "2 personnes"
+function guestCount(n) {
+  const [one, many] = t().rsvp.guestUnit;
+  return `${n} ${n === 1 ? one : many}`;
+}
+
+function fill(template, n) {
+  return template.replace("{guests}", guestCount(n));
+}
+
+// The most guests this invitation may bring. A null authorized count (still
+// being confirmed with the client) allows 1 — the server applies the same
+// rule and refuses anything above it, whatever the request says.
+function maxGuestsFor(invitation) {
+  return Math.max(invitation.authorizedGuests ?? 1, 1);
+}
+
+// Supabase answers in well under a second, but keep the patient UX for a bad
+// mobile connection: a "still sending" notice after SLOW_AFTER_MS, and a
+// retryable error only after TIMEOUT_MS.
 const SLOW_AFTER_MS = 8000;
 const TIMEOUT_MS = 30000;
 
-class RsvpError extends Error {
-  constructor(kind) {
-    super(kind);
-    this.kind = kind; // "config" | "network" | "timeout" | "server"
-  }
-}
-
-// One id per RSVP attempt, reused if the guest retries after a timeout: the
-// backend ignores a second submission carrying an id it has already stored,
-// so a request that landed after we stopped waiting can't create a duplicate row.
-function newSubmissionId() {
-  if (globalThis.crypto?.randomUUID) return crypto.randomUUID();
-  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
-}
-
-async function sendRsvp(payload) {
-  const endpoint = config.rsvp.endpoint;
-  if (!endpoint) {
-    console.error("[RSVP] config.rsvp.endpoint is empty — nothing was sent. Set it to the Apps Script web app URL.");
-    throw new RsvpError("config");
-  }
-
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
-  let response;
-  try {
-    // text/plain keeps this a "simple" request, so the browser skips the CORS
-    // preflight that Apps Script web apps can't answer.
-    response = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(payload),
-      signal: controller.signal,
-    });
-  } catch (err) {
-    throw new RsvpError(controller.signal.aborted ? "timeout" : "network");
-  } finally {
-    clearTimeout(timer);
-  }
-
-  if (!response.ok) throw new RsvpError("server");
-
-  // Apps Script answers HTTP 200 even when its own code fails, so the body's
-  // `ok` flag is the real success signal.
-  let body;
-  try {
-    body = await response.json();
-  } catch {
-    throw new RsvpError("server");
-  }
-  if (!body || body.ok !== true) {
-    console.error("[RSVP] backend rejected the submission:", body);
-    throw new RsvpError("server");
-  }
-}
+const SUBMIT_ERROR_KEYS = {
+  network: "errorNetwork",
+  timeout: "errorTimeout",
+  rate_limited: "errorRateLimited",
+  invalid_code: "errorInvalidCode",
+  invalid_guest_count: "errorGuestCount",
+};
 
 export function createRsvpSection() {
   if (!config.rsvp.enabled) return null;
 
-  const sectionTitle = el("h2", { class: "section-title-serif" }, t().rsvp.heading);
-
-  if (isDeadlinePassed()) {
-    const closedTitle = el("p", { class: "rsvp-success-title" }, t().rsvp.closedTitle);
-    const closedMsg = el("p", {}, t().rsvp.closedMessage);
-    const node = el("section", { class: "section", id: "rsvp" }, [
-      sectionTitle,
-      el("div", { class: "rsvp-success" }, [closedTitle, closedMsg]),
-    ]);
-
-    function updateLang() {
-      sectionTitle.textContent = t().rsvp.heading;
-      closedTitle.textContent = t().rsvp.closedTitle;
-      closedMsg.textContent = t().rsvp.closedMessage;
-    }
-
-    return { node, updateLang };
-  }
+  // Settled deadline: undefined while loading, then a "YYYY-MM-DD" string or
+  // null (unknown — the form stays open and the server decides).
+  let deadline;
+  let closedByServer = false;
+  let phase = "form"; // "form" | "success"
+  let formFor = null; // the invitation object the form was last filled from
 
   let attending = null; // "yes" | "no"
-  let guestCount = 1;
+  let guests = 1;
+  let maxGuests = 1;
   let inFlight = false;
-  let submissionId = newSubmissionId();
   let statusState = null; // { kind, key } — re-rendered on language change
+  let submittedUpdate = false;
 
-  const deadlineEl = el("p", { class: "rsvp-deadline" });
+  // --- Always-present header ---------------------------------------------
+  const sectionTitle = el("h2", { class: "section-title-serif" }, t().rsvp.heading);
+  const deadlineEl = el("p", { class: "rsvp-deadline", hidden: true });
 
-  const nameLabel = el("label", { class: "field-label", for: "rsvp-name" }, t().rsvp.name);
-  const nameInput = el("input", {
-    class: "field-input",
-    id: "rsvp-name",
-    type: "text",
-    autocomplete: "name",
-    placeholder: t().rsvp.namePlaceholder,
-  });
-  const nameError = el("p", { class: "field-error" });
+  // --- Notice (loading / no code / incomplete link / lookup error) --------
+  const noticeText = el("p", { class: "rsvp-notice-text" });
+  const noticeNote = el("p", { class: "rsvp-notice-note", hidden: true });
+  const retryBtn = el("button", { class: "btn btn-outline rsvp-retry-btn", type: "button", hidden: true }, t().rsvp.retry);
+  const noticeWrap = el("div", { class: "rsvp-notice", hidden: true }, [noticeText, noticeNote, retryBtn]);
+
+  retryBtn.addEventListener("click", () => loadInvitation());
+
+  // --- Closed --------------------------------------------------------------
+  const closedTitle = el("p", { class: "rsvp-success-title" }, t().rsvp.closedTitle);
+  const closedMsg = el("p", {}, t().rsvp.closedMessage);
+  const closedReply = el("p", { class: "rsvp-previous", hidden: true });
+  const closedWrap = el("div", { class: "rsvp-success", hidden: true }, [closedTitle, closedMsg, closedReply]);
+
+  // --- Form ------------------------------------------------------------------
+  const forLabel = el("p", { class: "field-label" }, t().rsvp.respondingFor);
+  const forName = el("p", { class: "rsvp-guest-name notranslate", translate: "no" });
+  const previousEl = el("p", { class: "rsvp-previous", hidden: true });
 
   // Honeypot — hidden from real users, bots often fill every field.
   const honeypot = el("input", {
@@ -145,20 +125,20 @@ export function createRsvpSection() {
   const attendingGroup = el("div", { class: "attending-group", role: "radiogroup" }, [yesBtn, noBtn]);
   const attendingError = el("p", { class: "field-error" });
 
-  const guestsLabel = el("label", { class: "field-label" }, t().rsvp.guests);
-  const guestValueEl = el("span", { class: "stepper-value" }, String(guestCount));
+  const guestsLabel = el("p", { class: "field-label" }, t().rsvp.guests);
+  const guestValueEl = el("span", { class: "stepper-value", "aria-live": "polite" }, "1");
   const decBtn = el("button", { class: "stepper-btn", type: "button", "aria-label": "-" }, "−");
   const incBtn = el("button", { class: "stepper-btn", type: "button", "aria-label": "+" }, "+");
-  const guestsWrap = el("div", { class: "field guests-field" }, [
-    guestsLabel,
-    el("div", { class: "guest-stepper" }, [decBtn, guestValueEl, incBtn]),
-  ]);
+  const stepper = el("div", { class: "guest-stepper" }, [decBtn, guestValueEl, incBtn]);
+  const guestsNote = el("p", { class: "rsvp-guests-note" });
+  const guestsWrap = el("div", { class: "field guests-field" }, [guestsLabel, stepper, guestsNote]);
   guestsWrap.hidden = true;
 
   const messageLabel = el("label", { class: "field-label", for: "rsvp-message" }, t().rsvp.message);
   const messageInput = el("textarea", {
     class: "field-textarea",
     id: "rsvp-message",
+    maxlength: "1000",
     placeholder: t().rsvp.messagePlaceholder,
   });
 
@@ -169,8 +149,8 @@ export function createRsvpSection() {
     statusText,
   ]);
 
-  const form = el("form", { class: "rsvp-form", novalidate: "true" }, [
-    el("div", { class: "field" }, [nameLabel, nameInput, nameError]),
+  const form = el("form", { class: "rsvp-form", novalidate: "true", hidden: true }, [
+    el("div", { class: "field rsvp-for" }, [forLabel, forName, previousEl]),
     honeypot,
     el("div", { class: "field" }, [attendingLabel, attendingGroup, attendingError]),
     guestsWrap,
@@ -179,10 +159,12 @@ export function createRsvpSection() {
     statusEl,
   ]);
 
+  // --- Success ---------------------------------------------------------------
   const successCheck = el("span", { html: icons.check });
   const successTitle = el("p", { class: "rsvp-success-title" }, t().rsvp.successTitle);
   const successMsg = el("p", {}, t().rsvp.successMessage);
-  const successWrap = el("div", { class: "rsvp-success", hidden: true }, [successCheck, successTitle, successMsg]);
+  const changeBtn = el("button", { class: "btn btn-outline rsvp-change-btn", type: "button" }, t().rsvp.changeReply);
+  const successWrap = el("div", { class: "rsvp-success", hidden: true }, [successCheck, successTitle, successMsg, changeBtn]);
 
   // Decorative background typography only — stays the literal word "RSVP"
   // regardless of language (see NOTES.md Batch 4), not sourced from t().
@@ -192,9 +174,25 @@ export function createRsvpSection() {
     watermark,
     sectionTitle,
     deadlineEl,
+    noticeWrap,
+    closedWrap,
     form,
     successWrap,
   ]);
+
+  // --- Form state --------------------------------------------------------
+  function renderGuests() {
+    guestValueEl.textContent = String(guests);
+    decBtn.disabled = inFlight || guests <= 1;
+    incBtn.disabled = inFlight || guests >= maxGuests;
+    // A single seat needs no stepper — just say so.
+    stepper.hidden = maxGuests <= 1;
+    const invitation = formFor;
+    if (!invitation) return;
+    if (invitation.authorizedGuests == null) guestsNote.textContent = t().rsvp.guestsUnconfirmed;
+    else if (maxGuests <= 1) guestsNote.textContent = t().rsvp.guestsSingle;
+    else guestsNote.textContent = fill(t().rsvp.guestsLimit, maxGuests);
+  }
 
   function setAttending(value) {
     attending = value;
@@ -204,19 +202,58 @@ export function createRsvpSection() {
     attendingError.textContent = "";
   }
 
-  yesBtn.addEventListener("click", () => setAttending("yes"));
-  noBtn.addEventListener("click", () => setAttending("no"));
+  function hasResponded(invitation) {
+    return invitation.rsvpStatus === "accepted" || invitation.rsvpStatus === "declined";
+  }
+
+  function previousReplyText(invitation, closed) {
+    const r = t().rsvp;
+    if (invitation.rsvpStatus === "accepted") {
+      return fill(closed ? r.closedAccepted : r.previousAccepted, Math.max(invitation.confirmedGuests ?? 1, 1));
+    }
+    if (invitation.rsvpStatus === "declined") return closed ? r.closedDeclined : r.previousDeclined;
+    return "";
+  }
+
+  // Fills the form from the invitation: their name, their seat limit, and —
+  // if they've already replied — their current answer, ready to change.
+  function fillForm(invitation) {
+    formFor = invitation;
+    maxGuests = maxGuestsFor(invitation);
+    forName.textContent = invitation.displayName;
+    if (invitation.rsvpStatus === "accepted") {
+      guests = Math.min(Math.max(invitation.confirmedGuests ?? 1, 1), maxGuests);
+      setAttending("yes");
+    } else if (invitation.rsvpStatus === "declined") {
+      guests = 1;
+      setAttending("no");
+    } else {
+      guests = 1;
+      setAttending(null);
+    }
+    renderGuests();
+    setStatus(null);
+    renderFormText();
+  }
+
+  function renderFormText() {
+    if (!formFor) return;
+    const previous = previousReplyText(formFor, false);
+    previousEl.textContent = previous;
+    previousEl.hidden = !previous;
+    submitBtn.textContent = inFlight ? t().rsvp.submitting : hasResponded(formFor) ? t().rsvp.submitUpdate : t().rsvp.submit;
+  }
 
   decBtn.addEventListener("click", () => {
-    guestCount = Math.max(1, guestCount - 1);
-    guestValueEl.textContent = String(guestCount);
+    guests = Math.max(1, guests - 1);
+    renderGuests();
   });
   incBtn.addEventListener("click", () => {
-    guestCount = Math.min(config.rsvp.maxGuests, guestCount + 1);
-    guestValueEl.textContent = String(guestCount);
+    guests = Math.min(maxGuests, guests + 1);
+    renderGuests();
   });
-
-  const controls = [nameInput, messageInput, yesBtn, noBtn, decBtn, incBtn];
+  yesBtn.addEventListener("click", () => setAttending("yes"));
+  noBtn.addEventListener("click", () => setAttending("no"));
 
   // `key` is an i18n key under t().rsvp, so the message follows a language
   // switch while it's on screen. kind: "error" | "slow" | null (clear).
@@ -237,78 +274,89 @@ export function createRsvpSection() {
     inFlight = sending;
     submitBtn.disabled = sending;
     submitBtn.classList.toggle("is-loading", sending);
-    submitBtn.textContent = sending ? t().rsvp.submitting : t().rsvp.submit;
     form.setAttribute("aria-busy", String(sending));
-    controls.forEach((c) => (c.disabled = sending));
+    [messageInput, yesBtn, noBtn].forEach((c) => (c.disabled = sending));
+    renderGuests();
+    renderFormText();
   }
 
   async function handleSubmit(evt) {
     evt.preventDefault();
     // A second submit while one is in flight (Enter key, double tap) must not
     // start another request — the disabled button alone doesn't cover Enter.
-    // Nor may a form that has already been submitted successfully go again.
-    if (inFlight || form.hidden) return;
+    // Nor may a form that isn't showing (already sent, closed) go again.
+    if (inFlight || form.hidden || !formFor) return;
 
-    nameError.textContent = "";
     attendingError.textContent = "";
     setStatus(null);
 
-    const name = nameInput.value.trim();
-    let hasError = false;
-
-    if (!name) {
-      nameError.textContent = t().rsvp.errorName;
-      hasError = true;
-    }
     if (!attending) {
       attendingError.textContent = t().rsvp.errorAttending;
-      hasError = true;
+      return;
     }
     if (honeypot.value.trim() !== "") {
       // Silently drop likely-bot submissions without revealing the trap.
       return;
     }
-    if (hasError) return;
 
-    const payload = {
-      name,
-      attending,
-      guests: attending === "yes" ? guestCount : 0,
-      message: messageInput.value.trim(),
-      language: getLang(),
-      guestParam: getGuestName(),
-      submittedAt: new Date().toISOString(),
-      submissionId,
-    };
+    const code = getInvitationCode();
+    if (!code) return; // unreachable: the form only shows for a found code
 
+    const wasUpdate = hasResponded(formFor);
     setSending(true);
     const slowTimer = setTimeout(() => setStatus("slow", "slowNotice"), SLOW_AFTER_MS);
 
+    let rows;
     try {
-      await sendRsvp(payload);
+      // The server re-checks everything: the code, the deadline, and the
+      // guest count against this invitation's authorized seats. The same
+      // invitation row is updated every time, so a retry or a second
+      // submission can never create a duplicate.
+      rows = await rpc(
+        "submit_rsvp",
+        {
+          p_code: code,
+          p_attending: attending === "yes",
+          p_guest_count: attending === "yes" ? guests : null,
+          p_message: messageInput.value.trim() || null,
+        },
+        { timeoutMs: TIMEOUT_MS }
+      );
     } catch (err) {
       clearTimeout(slowTimer);
-      const key = { network: "errorNetwork", timeout: "errorTimeout", server: "errorServer" }[err.kind] || "errorGeneric";
       setSending(false);
-      setStatus("error", key);
+      if (err.kind === "rsvp_closed") {
+        closedByServer = true;
+        setStatus(null);
+        render();
+        return;
+      }
+      // Never log the request: it carries the guest's code.
+      console.error("[RSVP] submission failed:", err.kind);
+      setStatus("error", SUBMIT_ERROR_KEYS[err.kind] || "errorServer");
       return;
     }
 
     clearTimeout(slowTimer);
     setStatus(null);
     setSending(false);
-    submissionId = newSubmissionId();
-    showSuccess();
+
+    const saved = Array.isArray(rows) ? rows[0] : null;
+    submittedUpdate = wasUpdate;
+    messageInput.value = "";
+    phase = "success";
+    updateInvitationRsvp({
+      rsvpStatus: saved?.rsvp_status === "declined" ? "declined" : "accepted",
+      confirmedGuests: Number.isInteger(saved?.confirmed_guests) ? saved.confirmed_guests : attending === "yes" ? guests : 0,
+    });
+    render();
+    animateSuccess();
   }
 
-  function showSuccess() {
-    form.hidden = true;
-    successWrap.hidden = false;
+  function animateSuccess() {
     const path = successCheck.querySelector(".rsvp-success-check path");
     const circle = successCheck.querySelector(".rsvp-success-check circle");
-    if (!path || !circle) return;
-
-    if (prefersReducedMotion) return;
+    if (!path || !circle || prefersReducedMotion) return;
 
     const pathLength = path.getTotalLength();
     const circleLength = circle.getTotalLength ? circle.getTotalLength() : 2 * Math.PI * 23;
@@ -319,26 +367,93 @@ export function createRsvpSection() {
       .to(path, { strokeDashoffset: 0, duration: 0.4, ease: "power2.out" }, "-=0.15");
   }
 
+  changeBtn.addEventListener("click", () => {
+    phase = "form";
+    formFor = null; // refill from the saved answer
+    render();
+  });
+
   form.addEventListener("submit", handleSubmit);
+
+  // --- Which view is showing -------------------------------------------------
+  function showNotice(key, { noteKey = null, retry = false } = {}) {
+    noticeText.textContent = t().rsvp[key];
+    noticeNote.textContent = noteKey ? t().rsvp[noteKey] : "";
+    noticeNote.hidden = !noteKey;
+    retryBtn.hidden = !retry;
+    retryBtn.textContent = t().rsvp.retry;
+    noticeWrap.hidden = false;
+  }
+
+  function render() {
+    const state = getInvitationState();
+    const closed = closedByServer || isDeadlinePassed(deadline);
+
+    deadlineEl.hidden = !deadline || closed;
+    if (deadline) deadlineEl.textContent = `${t().rsvp.deadlinePrefix} ${formatDeadline(deadline, getLang())}.`;
+
+    noticeWrap.hidden = true;
+    closedWrap.hidden = true;
+    form.hidden = true;
+    successWrap.hidden = true;
+
+    if (closed) {
+      closedTitle.textContent = t().rsvp.closedTitle;
+      closedMsg.textContent = t().rsvp.closedMessage;
+      const reply = state.status === "found" ? previousReplyText(state.invitation, true) : "";
+      closedReply.textContent = reply;
+      closedReply.hidden = !reply;
+      closedWrap.hidden = false;
+    } else if (state.status === "none") {
+      showNotice("noCode");
+    } else if (state.status === "not_found") {
+      showNotice("noCode", { noteKey: "incompleteLink" });
+    } else if (state.status === "error") {
+      showNotice(state.errorKind === "rate_limited" ? "errorRateLimited" : "lookupError", { retry: true });
+    } else if (state.status === "loading" || deadline === undefined) {
+      showNotice("loading");
+    } else if (phase === "success") {
+      successTitle.textContent = t().rsvp.successTitle;
+      successMsg.textContent = submittedUpdate ? t().rsvp.successUpdated : t().rsvp.successMessage;
+      changeBtn.textContent = t().rsvp.changeReply;
+      successWrap.hidden = false;
+    } else {
+      if (formFor !== state.invitation) fillForm(state.invitation);
+      form.hidden = false;
+    }
+    refreshScrollTriggers();
+  }
+
+  onInvitationChange(() => {
+    // A successful submit updates the stored invitation; keep the form's
+    // own copy in step so "Change my reply" and the labels stay current.
+    if (phase === "success") formFor = null;
+    render();
+  });
+
+  loadRsvpDeadline().then((value) => {
+    deadline = value;
+    render();
+  });
 
   function updateLang() {
     sectionTitle.textContent = t().rsvp.heading;
-    deadlineEl.textContent = `${t().rsvp.deadlinePrefix} ${formatDeadline(getLang())}.`;
-    nameLabel.textContent = t().rsvp.name;
-    nameInput.placeholder = t().rsvp.namePlaceholder;
     attendingLabel.textContent = t().rsvp.attending;
+    forLabel.textContent = t().rsvp.respondingFor;
     yesBtn.lastChild.textContent = t().rsvp.attendingYes;
     noBtn.lastChild.textContent = t().rsvp.attendingNo;
     guestsLabel.textContent = t().rsvp.guests;
     messageLabel.textContent = t().rsvp.message;
     messageInput.placeholder = t().rsvp.messagePlaceholder;
-    submitBtn.textContent = inFlight ? t().rsvp.submitting : t().rsvp.submit;
     if (statusState) statusText.textContent = t().rsvp[statusState.key];
-    successTitle.textContent = t().rsvp.successTitle;
-    successMsg.textContent = t().rsvp.successMessage;
+    renderGuests();
+    renderFormText();
+    // render() re-derives every other visible string (deadline, notice,
+    // closed, success) — but must not refill the form, so formFor stays put.
+    render();
   }
 
-  deadlineEl.textContent = `${t().rsvp.deadlinePrefix} ${formatDeadline(getLang())}.`;
+  render();
 
   return { node, updateLang };
 }

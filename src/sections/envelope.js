@@ -73,5 +73,11 @@ export function createEnvelopeSection() {
     flashEl: flash,
     hintEl: hint,
     disconnect: () => observer.disconnect(),
+    // The language can change while the envelope is still up (an
+    // invitation's preferred_language arrives after the first paint).
+    updateLang() {
+      hint.textContent = t().envelope.hint;
+      seal.querySelector(".envelope-seal-btn").setAttribute("aria-label", t().envelope.hint);
+    },
   };
 }

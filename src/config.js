@@ -218,13 +218,13 @@ export const config = {
   },
 
   music: {
-    // Plays track 1 first, then track 2, then loops back to track 1 —
+    // Plays the tracks in order and loops (a single track just repeats) —
     // starts on the envelope tap (a real user gesture, so autoplay is never
     // blocked) with a short fade-in. See vite.config.js for the build-time
     // check that hides the music button entirely if a listed file is
     // missing on disk.
     enabled: true,
-    tracks: ["/audio/song-1.mp3", "/audio/song-2.mp3"],
+    tracks: ["/audio/perfect.mp3"],
   },
 
   // Replies go to the guest-system's Supabase database, keyed by each

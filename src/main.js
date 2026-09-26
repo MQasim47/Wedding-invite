@@ -134,6 +134,7 @@ if (audioAvailable) {
   const tracks = config.music.tracks;
   audioEl = el("audio", { src: tracks[0], preload: "metadata" });
   audioEl.volume = MUSIC_VOLUME;
+  audioEl.loop = tracks.length === 1; // gapless repeat; "ended" never fires
   document.body.appendChild(audioEl);
 
   audioEl.addEventListener("ended", () => {

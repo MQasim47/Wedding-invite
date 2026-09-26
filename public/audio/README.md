@@ -3,8 +3,7 @@
 Playlist tracks live here and are listed in order in `config.music.tracks`
 (`src/config.js`). Currently:
 
-- `song-1.mp3` — "When I Say I Do" (plays first)
-- `song-2.mp3` — "A Thousand Years" (plays second, then loops back to track 1)
+- `perfect.mp3` — "Perfect" (the only track; loops)
 
 Music starts on the envelope tap (a real user gesture, so autoplay is never
 blocked) with a 2-second fade-in. If any listed track is missing on disk,

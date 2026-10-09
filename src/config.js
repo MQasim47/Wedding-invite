@@ -178,6 +178,9 @@ export const config = {
       { name: "Marie", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "/images/wedding-party/marie.webp" },
       { name: "Nadège", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "/images/wedding-party/nadege.webp" },
       { name: "Vanilla", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "/images/wedding-party/vanilla.webp" },
+      { name: "Ange", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "/images/wedding-party/ange.webp", alt: { en: "Portrait of Ange, bridesmaid", fr: "Portrait d'Ange, demoiselle d'honneur" } },
+      { name: "Lizzy", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "/images/wedding-party/lizzy.webp", alt: { en: "Portrait of Lizzy, bridesmaid", fr: "Portrait de Lizzy, demoiselle d'honneur" } },
+      { name: "Vanessa", role: { en: "Bridesmaid", fr: "Demoiselle d'honneur" }, photo: "/images/wedding-party/vanessa.webp", alt: { en: "Portrait of Vanessa, bridesmaid", fr: "Portrait de Vanessa, demoiselle d'honneur" } },
     ],
     groomsmen: [
       { name: "Franck", role: { en: "Best Man", fr: "Témoin du marié" }, photo: "/images/wedding-party/franck.webp", lead: true },
@@ -187,6 +190,9 @@ export const config = {
       { name: "Arnaud", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "/images/wedding-party/arnaud.webp" },
       { name: "Serge", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "/images/wedding-party/serge.webp" },
       { name: "George", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "/images/wedding-party/george.webp" },
+      { name: "Dipie", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "/images/wedding-party/dipie.webp", alt: { en: "Portrait of Dipie, groomsman", fr: "Portrait de Dipie, garçon d'honneur" } },
+      { name: "Ceverin", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "/images/wedding-party/ceverin.webp", alt: { en: "Portrait of Ceverin, groomsman", fr: "Portrait de Ceverin, garçon d'honneur" } },
+      { name: "Micheal", role: { en: "Groomsman", fr: "Garçon d'honneur" }, photo: "/images/wedding-party/micheal.webp", alt: { en: "Portrait of Micheal, groomsman", fr: "Portrait de Micheal, garçon d'honneur" } },
     ],
   },
 

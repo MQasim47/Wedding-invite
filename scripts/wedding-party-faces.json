@@ -8,5 +8,11 @@
   "pecos": { "cx": 487, "cy": 353, "face": 364 },
   "arnaud": { "cx": 604, "cy": 718, "face": 462 },
   "george": { "cx": 573, "cy": 398, "face": 377 },
-  "serge": { "cx": 705, "cy": 371, "face": 397 }
+  "serge": { "cx": 705, "cy": 371, "face": 397 },
+  "ange": { "cx": 327, "cy": 249, "face": 220, "despeckle": true, "quality": 68 },
+  "lizzy": { "cx": 255, "cy": 182, "face": 196, "despeckle": true, "quality": 68 },
+  "vanessa": { "cx": 181, "cy": 303, "face": 246, "despeckle": true, "quality": 68 },
+  "dipie": { "cx": 252, "cy": 198, "face": 230, "despeckle": true, "clearTop": 12, "padTop": 16, "quality": 68 },
+  "ceverin": { "cx": 261, "cy": 199, "face": 228, "despeckle": true, "clearTop": 13, "padTop": 16, "quality": 68 },
+  "micheal": { "cx": 204, "cy": 213, "face": 206, "despeckle": true, "clearTop": 13, "padTop": 16, "quality": 68 }
 }

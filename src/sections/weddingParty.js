@@ -19,10 +19,15 @@ function columnsFor(count) {
   return Math.min(count, 3) || 1;
 }
 
+// Bilingual alt text when a member has one, else just their name.
+function altText(person) {
+  return person.alt?.[getLang()] || person.alt?.en || person.name;
+}
+
 function buildMember(person, kind) {
   const isLead = person.lead === true;
   const photoInner = person.photo
-    ? el("img", { src: person.photo, alt: person.name, loading: "lazy", decoding: "async" })
+    ? el("img", { src: person.photo, alt: altText(person), loading: "lazy", decoding: "async" })
     : fromHTML(silhouetteAvatarSVG(kind));
 
   const photoWrap = el("div", { class: "party-photo-wrap" }, [fromHTML(ringSVG(isLead)), el("div", { class: "party-photo" }, [photoInner])]);
@@ -36,7 +41,7 @@ function buildMember(person, kind) {
     roleEl,
   ]);
 
-  return { memberEl, roleEl, person };
+  return { memberEl, roleEl, person, imgEl: person.photo ? photoInner : null };
 }
 
 // Config-driven wedding party section, placed after "Our Story". A member
@@ -76,11 +81,9 @@ export function createWeddingPartySection() {
     title.textContent = t().weddingParty.title;
     bridesmaidsHeading.textContent = t().weddingParty.bridesmaids;
     groomsmenHeading.textContent = t().weddingParty.groomsmen;
-    bridesmaidEntries.forEach((entry) => {
+    [...bridesmaidEntries, ...groomsmenEntries].forEach((entry) => {
       entry.roleEl.textContent = entry.person.role[lang] || entry.person.role.en;
-    });
-    groomsmenEntries.forEach((entry) => {
-      entry.roleEl.textContent = entry.person.role[lang] || entry.person.role.en;
+      if (entry.imgEl) entry.imgEl.alt = altText(entry.person);
     });
   }
 

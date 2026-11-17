@@ -1,0 +1,90 @@
+@import "../styles/theme.css";
+
+* { box-sizing: border-box; margin: 0; }
+
+html, body {
+  min-height: 100%;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-serif);
+  -webkit-text-size-adjust: 100%;
+}
+
+.checkin {
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 20px 20px calc(32px + env(safe-area-inset-bottom));
+  min-height: 100vh;
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+
+.checkin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+.checkin-couple { font-size: 1.15rem; font-weight: 600; letter-spacing: 0.04em; color: var(--color-primary-deep); }
+.checkin-lang { background: none; border: 1px solid var(--color-primary-deep); color: var(--color-primary-deep); border-radius: 999px; padding: 4px 12px; font: inherit; font-size: 0.85rem; }
+
+.checkin-body { display: grid; gap: 14px; text-align: center; }
+.checkin-title { font-size: 1.8rem; font-weight: 700; }
+.checkin-name { font-size: 1.4rem; font-weight: 600; }
+.checkin-label { font-weight: 600; margin-top: 8px; }
+.checkin-help { font-size: 0.92rem; color: var(--color-label); }
+
+.checkin-form { display: grid; gap: 12px; text-align: left; }
+.checkin-input {
+  width: 100%;
+  font: inherit;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 1.3rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 14px;
+  border: 1.5px solid var(--color-label);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.checkin-btn {
+  width: 100%;
+  font: inherit;
+  font-size: 1.15rem;
+  font-weight: 700;
+  padding: 16px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--color-primary-deep);
+  color: #fff;
+}
+.checkin-btn--ghost { background: transparent; color: var(--color-primary-deep); border: 1.5px solid var(--color-primary-deep); }
+.checkin-link { background: none; border: 0; font: inherit; font-size: 0.9rem; color: var(--color-label); text-decoration: underline; padding: 8px; }
+
+.checkin-choices { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.checkin-choice {
+  min-width: 56px;
+  height: 56px;
+  font: inherit;
+  font-size: 1.4rem;
+  font-weight: 700;
+  border-radius: 14px;
+  border: 1.5px solid var(--color-label);
+  background: #fff;
+  color: var(--color-text);
+}
+.checkin-choice[aria-pressed="true"] { background: var(--color-primary-deep); border-color: var(--color-primary-deep); color: #fff; }
+
+.checkin-badge {
+  width: 88px;
+  height: 88px;
+  margin: 0 auto;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 3rem;
+  color: #fff;
+  background: #2f7d4f;
+}
+.checkin-badge--info { background: var(--color-accent); }
+
+.checkin-msg { padding: 16px; border-radius: 12px; font-size: 1.05rem; }
+.checkin-msg--info { background: #fff; }
+.checkin-msg--warn { background: #fff4d6; color: #5c4300; }
+.checkin-msg--error { background: #fde8e8; color: #7a1c1c; }

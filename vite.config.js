@@ -78,5 +78,16 @@ export default defineConfig(async ({ command, mode }) => {
     define: {
       __AUDIO_AVAILABLE__: JSON.stringify(audioAvailable),
     },
+    // Two pages: the invitation, and the door check-in page that the
+    // entrance QR opens (/checkin/?t=...). Separate so the door page loads
+    // fast on a weak signal without the animated invitation's assets.
+    build: {
+      rolldownOptions: {
+        input: {
+          main: resolve("index.html"),
+          checkin: resolve("checkin/index.html"),
+        },
+      },
+    },
   };
 });

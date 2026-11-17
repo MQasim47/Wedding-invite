@@ -1,0 +1,22 @@
+<!doctype html>
+<!--
+  Door check-in. Opened by scanning the rotating QR a staff phone shows at
+  the entrance (/checkin/?t=<door token>). Deliberately separate from the
+  animated invitation: it has to load fast on a weak signal.
+-->
+<html lang="en" translate="no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="google" content="notranslate" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="__THEME_COLOR__" />
+    <title>Check-in · __META_TITLE__</title>
+  </head>
+  <body>
+    <main id="checkin" class="checkin" aria-live="polite"></main>
+    <script type="module" src="/src/checkin/main.js"></script>
+  </body>
+</html>

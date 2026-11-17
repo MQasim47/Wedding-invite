@@ -1,4 +1,7 @@
 import { rpc, getSetting } from "./supabase.js";
+import { normalizeCode, rememberPassCode, readPassCode, forgetPassCode } from "./code.js";
+
+export { normalizeCode };
 
 // ============================================================================
 // Personal invitation codes (?i=<code>), issued by the guest-system
@@ -11,17 +14,7 @@ import { rpc, getSetting } from "./supabase.js";
 // that RPC's POST body.
 // ============================================================================
 
-// Same alphabet as guest-system/src/lib/codes.ts (no I, L, O, 0, 1).
-const CODE_PATTERN = /^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{8}$/;
 const SESSION_KEY = "wedding-invite-code";
-
-// Guests paste links from WhatsApp/SMS, so be forgiving about case and stray
-// whitespace (including a trailing "%20").
-export function normalizeCode(raw) {
-  if (typeof raw !== "string") return null;
-  const code = raw.replace(/\s+/g, "").toUpperCase();
-  return CODE_PATTERN.test(code) ? code : null;
-}
 
 function readSession() {
   try {
@@ -123,9 +116,12 @@ export async function loadInvitation() {
   try {
     const rows = await rpc("get_invitation_by_public_code", { p_code: resolved.code });
     if (Array.isArray(rows) && rows.length > 0 && rows[0]) {
+      // Confirmed valid: remember it for the door check-in page (see code.js).
+      rememberPassCode(resolved.code);
       setState({ status: "found", invitation: toInvitation(rows[0]) });
     } else {
       writeSession(null);
+      if (readPassCode() === resolved.code) forgetPassCode();
       setState({ status: "not_found" });
     }
   } catch (err) {

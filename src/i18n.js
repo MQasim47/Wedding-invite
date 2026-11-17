@@ -49,6 +49,19 @@ export const i18n = {
       marriedSub: "Thank you for celebrating with us.",
       addToCalendar: "Add to Calendar",
     },
+    // Entrance pass (shown only with a valid personal link).
+    pass: {
+      title: "Your entrance pass",
+      intro: "Take a screenshot of this pass and bring it on the day.",
+      admits: (n) => (n === 1 ? "Admits 1" : `Admits up to ${n}`),
+      codeLabel: "Your code",
+      steps: [
+        "At the entrance, open your phone camera and scan the code shown by our welcome team — you'll be checked in on your own phone.",
+        "No signal or no battery? Show this pass (or the screenshot) to a member of the team.",
+      ],
+      save: "Save pass image",
+      saved: "Saved — check your photos or downloads.",
+    },
     rsvp: {
       title: "RSVP",
       heading: "RSVP",
@@ -159,6 +172,18 @@ export const i18n = {
       married: "Jeunes mariés !",
       marriedSub: "Merci d'avoir célébré avec nous.",
       addToCalendar: "Ajouter au calendrier",
+    },
+    pass: {
+      title: "Votre pass d'entrée",
+      intro: "Faites une capture d'écran de ce pass et gardez-la pour le jour J.",
+      admits: (n) => (n === 1 ? "Valable pour 1 personne" : `Valable jusqu'à ${n} personnes`),
+      codeLabel: "Votre code",
+      steps: [
+        "À l'entrée, ouvrez l'appareil photo de votre téléphone et scannez le code présenté par l'équipe d'accueil : vous serez enregistré(e) sur votre propre téléphone.",
+        "Pas de réseau ou plus de batterie ? Montrez ce pass (ou la capture d'écran) à un membre de l'équipe.",
+      ],
+      save: "Enregistrer l'image du pass",
+      saved: "Enregistré — regardez dans vos photos ou téléchargements.",
     },
     rsvp: {
       title: "RSVP",

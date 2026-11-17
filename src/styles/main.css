@@ -1928,3 +1928,28 @@ section.section > .decor-corner--br { bottom: 4px; right: 4px; transform: rotate
   .fade-up { opacity: 1; transform: none; }
   .story-photo-frame img { transform: none; }
 }
+
+/* ---------------------------------------------------------------------- */
+/* Entrance pass (personal links only)                                     */
+/* ---------------------------------------------------------------------- */
+.pass-section { text-align: center; }
+.pass-section[hidden] { display: none; }
+.pass-intro { margin: -16px auto 20px; max-width: 32ch; }
+.pass-card {
+  margin: 0 auto;
+  max-width: 320px;
+  padding: 20px 18px 22px;
+  border-radius: 18px;
+  background: #fff;
+  border: 1px solid rgba(var(--color-accent-rgb), 0.45);
+  box-shadow: 0 10px 30px rgba(var(--color-primary-rgb), 0.12);
+}
+.pass-qr { display: block; width: 100%; max-width: 260px; height: auto; aspect-ratio: 1; margin: 0 auto; }
+.pass-code-label { margin-top: 12px; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-label); }
+.pass-code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 1.25rem; letter-spacing: 0.18em; }
+.pass-name { margin-top: 10px; font-size: 1.3rem; font-weight: 600; }
+.pass-admits { color: var(--color-label); }
+.pass-steps { margin: 22px auto 0; max-width: 34ch; padding-left: 1.2em; text-align: left; display: grid; gap: 10px; }
+.pass-save { margin-top: 20px; }
+.pass-save:disabled { opacity: 0.6; }
+.pass-saved { margin-top: 8px; font-size: 0.85rem; color: var(--color-label); min-height: 1.2em; }

@@ -33,6 +33,7 @@ import { createVenueSection } from "./sections/venue.js";
 import { createCountdownSection } from "./sections/countdown.js";
 import { createFlowerBandSection } from "./sections/flowerBand.js";
 import { createRsvpSection } from "./sections/rsvp.js";
+import { createPassSection } from "./sections/pass.js";
 import { createExtrasSections } from "./sections/extras.js";
 import { createClosingSection } from "./sections/closing.js";
 
@@ -79,6 +80,7 @@ registerSection(createVenueSection());
 registerSection(createCountdownSection());
 const flowerBand = registerSection(createFlowerBandSection());
 registerSection(createRsvpSection());
+registerSection(createPassSection());
 createExtrasSections().forEach(registerSection);
 const closingSection = registerSection(createClosingSection());
 

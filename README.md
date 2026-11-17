@@ -224,6 +224,29 @@ its historical responses — see its README.
 mocked Supabase (EN and FR); `node scripts/rsvp-check.mjs live <code>` drives
 the real form against the real database for one invitation code.
 
+## Entrance pass and door check-in
+
+**Pass.** With a valid `?i=` the page shows **Your entrance pass**
+(`src/sections/pass.js`). It holds a QR of the guest's own personal link,
+the same single identifier every other QR uses, plus their code, name, and
+how many people it admits. There is also a "Save pass image" button. The
+`qrcode` library is loaded only for guests with a valid code. Once a code
+is confirmed valid it is also remembered in `localStorage`
+(`wedding-pass-code`, see `src/utils/code.js`), so the check-in page knows
+who they are even when it opens in a new tab.
+
+**Check-in page: `/checkin/?t=<door token>`.** This is a separate,
+lightweight page: `checkin/index.html` and `src/checkin/`, built as a second
+Vite entry. It opens when a guest scans the rotating QR on a staff phone at
+the entrance. The page takes the code from `?i=`, or from the remembered
+pass code, or asks for it. A whole pasted link works too. It then calls
+`door_guest_lookup` and `door_self_check_in`. Both refuse anything without
+a door token from the last ~2 minutes, so a code alone can't check anyone
+in. A repeat scan shows when they were already checked in. An expired token
+asks them to scan again, and the remembered code makes the rescan
+instant. How the token works is described in the guest-system README
+("Door check-in").
+
 ## Legacy greeting (`?guest=`)
 
 Links sent before invitation codes existed used `?guest=Jane%20Doe`. They

@@ -36,6 +36,7 @@ const STR = {
     notYou: "Not you? Use a different code",
     done: "You're checked in!",
     doneSub: (n, max) => `${n} of ${max} arrived. Enjoy the celebration!`,
+    table: (nums) => (nums.length === 1 ? `Table ${nums[0]}` : `Tables ${nums.join(", ")}`),
     already: "You're already checked in",
     alreadySub: (n, max, time, staff) =>
       `${n} of ${max} checked in at ${time}${staff ? " by the welcome team" : ""}.`,
@@ -62,6 +63,7 @@ const STR = {
     notYou: "Ce n'est pas vous ? Utiliser un autre code",
     done: "Vous êtes enregistré(e) !",
     doneSub: (n, max) => `${n} sur ${max} arrivé(s). Belle fête !`,
+    table: (nums) => (nums.length === 1 ? `Table ${nums[0]}` : `Tables ${nums.join(", ")}`),
     already: "Vous êtes déjà enregistré(e)",
     alreadySub: (n, max, time, staff) =>
       `${n} sur ${max} enregistré(s) à ${time}${staff ? " par l'équipe d'accueil" : ""}.`,
@@ -162,12 +164,22 @@ function askForCode(problem) {
   });
 }
 
+// The guest's table, when their invitation is linked to one. Returns
+// nothing at all otherwise (most invitations have no table), so the screen
+// is exactly what it was before seating existed.
+function tableView(result) {
+  const tables = Array.isArray(result?.tables) ? result.tables.filter((t) => t && Number.isFinite(t.number)) : [];
+  if (tables.length === 0) return [];
+  return [el("p", { class: "checkin-table", "data-testid": "guest-table" }, s().table(tables.map((t) => t.number)))];
+}
+
 function alreadyView(result) {
   return () => [
     el("div", { class: "checkin-badge checkin-badge--info" }, "✓"),
     el("h1", { class: "checkin-title" }, s().already),
     el("p", { class: "checkin-name notranslate", translate: "no" }, result.display_name || ""),
     el("p", {}, s().alreadySub(result.arrived, result.max_guests, formatTime(result.checked_in_at), result.checked_in_by_staff)),
+    ...tableView(result),
     el("p", { class: "checkin-help" }, s().alreadyMore),
   ];
 }
@@ -263,7 +275,7 @@ async function checkIn(code, info, count) {
         el("h1", { class: "checkin-title" }, s().done),
         el("p", { class: "checkin-name notranslate", translate: "no" }, result.display_name),
         el("p", {}, s().doneSub(result.arrived, result.max_guests)),
-        // Seating (Phase 3, part two) will be shown here.
+        ...tableView(result),
       ]);
     case "already_checked_in":
       return show(alreadyView(result));

@@ -28,6 +28,7 @@ html, body {
 .checkin-name { font-size: 1.4rem; font-weight: 600; }
 .checkin-label { font-weight: 600; margin-top: 8px; }
 .checkin-help { font-size: 0.92rem; color: var(--color-label); }
+.checkin-table { font-size: 2.2rem; font-weight: 700; color: var(--color-primary-deep); border: 2px solid var(--color-primary-deep); border-radius: 12px; padding: 10px 16px; justify-self: center; }
 
 .checkin-form { display: grid; gap: 12px; text-align: left; }
 .checkin-input {
